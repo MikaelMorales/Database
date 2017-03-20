@@ -45,3 +45,52 @@ CREATE TABLE Series (
 	FOREIGN KEY (publisher_id) REFERENCES Publisher(id),
 	FOREIGN KEY (language_id) REFERENCES Language(id)
 )
+
+CREATE TABLE Issue (
+	id INTEGER,
+	issue_number INTEGER,
+	series_id INTEGER,
+	indicia_publisher_id INTEGER NOT NULL,
+	publication_date CHAR(20),
+	price INTEGER,
+	page_count INTEGER,
+	indicia_frequency CHAR(20),
+	editing CHAR(20),
+	notes CHAR(100),
+	isbn CHAR(50),
+	valid_isbn CHAR(50),
+	barcode INTEGER,
+	title CHAR(50),
+	on_sale_date CHAR(20),
+	rating INTEGER,
+	PRIMARY KEY (id),
+	FOREIGN KEY (series_id) REFERENCES Series(id),
+	FOREIGN KEY (indicia_publisher_id) REFERENCES Indicia_Publisher(id)
+)
+
+CREATE TABLE Indicia_Publisher (
+	id INTEGER,
+	name CHAR(20),
+	publisher_id INTEGER NOT NULL,
+	country_id INTEGER NOT NULL,
+	year_began INTEGER,
+	year_ended INTEGER,
+	is_surrogate INTEGER,
+	notes CHAR(100),
+	url CHAR(100),
+	PRIMARY KEY (id),
+	FOREIGN KEY (publisher_id) REFERENCES Publisher(id),
+	FOREIGN KEY (country_id) REFERENCES Country(id)
+)
+
+CREATE TABLE Publisher (
+	id INTEGER,
+	name CHAR(50),
+	country_id INTEGER NOT NULL,
+	year_began INTEGER,
+	year_ended INTEGER,
+	notes CHAR(100),
+	url CHAR(100),
+	PRIMARY KEY (id),
+	FOREIGN KEY (country_id) REFERENCES Country(id)
+)
