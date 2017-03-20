@@ -94,3 +94,59 @@ CREATE TABLE Publisher (
 	PRIMARY KEY (id),
 	FOREIGN KEY (country_id) REFERENCES Country(id)
 )
+
+CREATE TABLE Brand_Group (
+	id INTEGER,
+	name CHAR(50),
+	year_began INTEGER,
+	year_ended INTEGER,
+	notes CHAR(100),
+	url CHAR(100),
+	publisher_id INTEGER NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (publisher_id) REFERENCES Publisher(id)
+)
+
+CREATE TABLE Country (
+	id INTEGER,
+	code CHAR(10),
+	name CHAR(30),
+	PRIMARY KEY (id)
+)
+
+CREATE TABLE Language (
+	id INTEGER,
+	code CHAR(10),
+	name CHAR(30),
+	PRIMARY KEY (id)
+)
+
+CREATE TABLE Series_Publication_Type (
+	id INTEGER,
+	name CHAR(30),
+	PRIMARY KEY (id)
+)
+
+CREATE TABLE Story_Type (
+	id INTEGER,
+	name CHAR(30),
+	PRIMARY KEY (id)
+)
+
+CREATE TABLE Story_Reprint (
+	id INTEGER,
+	origin_id INTEGER NOT NULL,
+	target_id INTEGER NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
+)
+
+CREATE TABLE Issue_Reprint (
+	id INTEGER,
+	origin_issue_id INTEGER NOT NULL,
+	target_target_id INTEGER NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (origin_issue_id) REFERENCES Issue(id),
+	FOREIGN KEY (target_target_id) REFERENCES Issue(id)
+)
