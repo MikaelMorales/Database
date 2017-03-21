@@ -1,8 +1,8 @@
 CREATE TABLE Story (
 	id INTEGER,
-	title CHAR(64),
+	title TEXT,
 	feature CHAR(64),
-	issue_id INTEGER NOT NULL,
+	issue_id INTEGER, -- Certaines ne le contienne pas donc a voir si on laisse NOT NULL
 	script TEXT,
 	pencils CHAR(64),
 	inks CHAR(64),
@@ -14,7 +14,7 @@ CREATE TABLE Story (
 	synopsis TEXT,
 	reprint_notes TEXT,
 	notes TEXT,
-	type_id INTEGER NOT NULL,
+	type_id INTEGER NOT NULL, -- Je l'ai presque tout le temps vu on pourrait le garder not null
 	PRIMARY KEY (id),
 	FOREIGN KEY (issue_id) REFERENCES Issue(id),
 	FOREIGN KEY (type_id) REFERENCES Story_Type(id)
@@ -72,14 +72,14 @@ CREATE TABLE Issue (
 
 CREATE TABLE Indicia_Publisher (
 	id INTEGER,
-	name CHAR(20),
-	publisher_id INTEGER NOT NULL,
-	country_id INTEGER NOT NULL,
-	year_began INTEGER,
-	year_ended INTEGER,
-	is_surrogate INTEGER,
-	notes CHAR(100),
-	url CHAR(100),
+	name TEXT,
+	publisher_id INTEGER NOT NULL, -- Toujours vu: devrait laisser not null
+	country_id INTEGER NOT NULL, -- Pareil presque toujours vu
+	year_began INTEGER, -- Des fois ils écrivent NULL a la place de laisser blanc: faudrait effacer tous les NULL
+	year_ended INTEGER, -- Des fois ils écrivent NULL a la place de laisser blanc: faudrait effacer tous les NULL
+	is_surrogate INTEGER, -- Always 0 or 1
+	notes TEXT,
+	url CHAR(256),
 	PRIMARY KEY (id),
 	FOREIGN KEY (publisher_id) REFERENCES Publisher(id),
 	FOREIGN KEY (country_id) REFERENCES Country(id)
@@ -87,12 +87,12 @@ CREATE TABLE Indicia_Publisher (
 
 CREATE TABLE Publisher (
 	id INTEGER,
-	name CHAR(50),
-	country_id INTEGER NOT NULL,
+	name TEXT,
+	country_id INTEGER NOT NULL, -- tojours vu: devrait rester NOT NULL
 	year_began INTEGER,
-	year_ended INTEGER,
-	notes CHAR(100),
-	url CHAR(100),
+	year_ended INTEGER, -- souvent NULL quand pas finis par exemple
+	notes TEXT,
+	url CHAR(256),
 	PRIMARY KEY (id),
 	FOREIGN KEY (country_id) REFERENCES Country(id)
 )
@@ -130,12 +130,12 @@ CREATE TABLE Publisher_publishes_serie (
 
 CREATE TABLE Brand_Group (
 	id INTEGER,
-	name CHAR(50),
-	year_began INTEGER,
-	year_ended INTEGER,
-	notes CHAR(100),
-	url CHAR(100),
-	publisher_id INTEGER NOT NULL,
+	name TEXT,
+	year_began INTEGER, -- Souvent mis null 
+	year_ended INTEGER, -- Presque jamais remplis, toujours NULL ou rien, on devrait clean mais le laisser quand même
+	notes TEXT,
+	url CHAR(256),
+	publisher_id INTEGER NOT NULL, -- On peut laisser NOT NULL, toujours mis dans la table
 	PRIMARY KEY (id),
 	FOREIGN KEY (publisher_id) REFERENCES Publisher(id)
 )
@@ -156,13 +156,13 @@ CREATE TABLE Language (
 
 CREATE TABLE Series_Publication_Type (
 	id INTEGER,
-	name CHAR(30),
+	name CHAR(16), --maximum est 8 pour le moment mais permet d'avoir une marge.
 	PRIMARY KEY (id)
 )
 
 CREATE TABLE Story_Type (
 	id INTEGER,
-	name CHAR(30),
+	name TEXT,
 	PRIMARY KEY (id)
 )
 
