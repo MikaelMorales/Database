@@ -22,11 +22,11 @@ CREATE TABLE Story (
 
 CREATE TABLE Series (
 	id INTEGER,
-	name CHAR(64),
-	format TEXT,
+	name TEXT,
+	format TEXT, -- reraly appears (almost never)
 	year_began INTEGER,
 	year_ended INTEGER,
-	publication_dates CHAR(20),
+	publication_dates CHAR(64), -- reraly appears (almost never)
 	first_issue_id INTEGER,
 	last_issue_id INTEGER,
 	publisher_id INTEGER,
@@ -34,7 +34,7 @@ CREATE TABLE Series (
 	language_id INTEGER,
 	notes TEXT,
 	color TEXT,
-	dimensions CHAR(20),
+	dimensions TEXT,
 	paper_stock TEXT,
 	binding TEXT,
 	publishing_format TEXT,
@@ -50,20 +50,20 @@ CREATE TABLE Series (
 
 CREATE TABLE Issue (
 	id INTEGER,
-	issue_number INTEGER,
+	issue_number CHAR(32),
 	series_id INTEGER,
-	indicia_publisher_id INTEGER NOT NULL,
-	publication_date CHAR(20),
-	price INTEGER,
+	indicia_publisher_id INTEGER, -- there was NOT NULL here but in the file, it's almost always NULL
+	publication_date CHAR(64), -- for example "monthly"
+	price TEXT,
 	page_count INTEGER,
-	indicia_frequency CHAR(20),
-	editing CHAR(20),
-	notes CHAR(100),
-	isbn CHAR(50),
-	valid_isbn CHAR(50),
-	barcode INTEGER,
-	title CHAR(50),
-	on_sale_date CHAR(20),
+	indicia_frequency CHAR(64),
+	editing TEXT,
+	notes TEXT,
+	isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any isbn in the file)
+	valid_isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any valid_isbn in the file)
+	barcode TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any barcode in the file)
+	title TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any title in the file)
+	on_sale_date DATE, -- or CHAR(20) for example (but in the file, it was YYYY-MM-DD)
 	rating INTEGER,
 	PRIMARY KEY (id),
 	FOREIGN KEY (series_id) REFERENCES Series(id),
@@ -142,15 +142,15 @@ CREATE TABLE Brand_Group (
 
 CREATE TABLE Country (
 	id INTEGER,
-	code CHAR(10),
-	name CHAR(30),
+	code CHAR(8), -- code max length is 4 in the file but we prefer to be safe
+	name TEXT,
 	PRIMARY KEY (id)
 )
 
 CREATE TABLE Language (
 	id INTEGER,
-	code CHAR(10),
-	name CHAR(30),
+	code CHAR(8), -- code max length is 4 in the file but we prefer to be safe
+	name TEXT,
 	PRIMARY KEY (id)
 )
 
