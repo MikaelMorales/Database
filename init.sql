@@ -30,7 +30,7 @@ CREATE TABLE Series (
 	first_issue_id INTEGER NOT NULL,
 	last_issue_id INTEGER NOT NULL,
 	publisher_id INTEGER,
-	country_id INTEGER,
+	country_id INTEGER NOT NULL,
 	language_id INTEGER,
 	notes TEXT,
 	color TEXT,
@@ -39,7 +39,6 @@ CREATE TABLE Series (
 	binding TEXT,
 	publishing_format TEXT,
 	publication_type_id INTEGER,
-	country_id INTEGER NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (first_issue_id) REFERENCES Issue(id),
 	FOREIGN KEY (last_issue_id) REFERENCES Issue(id),
@@ -88,37 +87,13 @@ CREATE TABLE Indicia_Publisher (
 CREATE TABLE Publisher (
 	id INTEGER,
 	name TEXT,
-	country_id INTEGER NOT NULL, -- tojours vu: devrait rester NOT NULL
+	country_id INTEGER NOT NULL, -- toujours vu: devrait rester NOT NULL
 	year_began INTEGER,
 	year_ended INTEGER, -- souvent NULL quand pas finis par exemple
 	notes TEXT,
 	url CHAR(256),
 	PRIMARY KEY (id),
 	FOREIGN KEY (country_id) REFERENCES Country(id)
-)
-
-CREATE TABLE Series_contain_issues (
-	serie_id INTEGER NOT NULL,
-	issue_id INTEGER NOT NULL,
-	PRIMARY KEY (serie_id, issue_id),
-	FOREIGN KEY (serie_id) REFERENCES Series(id),
-	FOREIGN KEY (issue_id) REFERENCES Issue(id)
-)
-
-CREATE TABLE Series_have_pubtype (
-	serie_id INTEGER NOT NULL,
-	pubtype_id INTEGER NOT NULL,
-	PRIMARY KEY (serie_id, pubtype_id),
-	FOREIGN KEY (serie_id) REFERENCES Series(id),
-	FOREIGN KEY (pubtype_id) REFERENCES Series_Publication_Type(id)
-)
-
-CREATE TABLE Series_have_language (
-	serie_id INTEGER NOT NULL,
-	language_id INTEGER NOT NULL,
-	PRIMARY KEY (serie_id, language_id),
-	FOREIGN KEY (serie_id) REFERENCES Series(id),
-	FOREIGN KEY (language_id) REFERENCES Language(id)
 )
 
 CREATE TABLE Publisher_publishes_serie (
