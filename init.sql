@@ -23,7 +23,7 @@ CREATE TABLE Story (
 CREATE TABLE Series (
 	id INTEGER,
 	name TEXT,
-	-- format TEXT, -- rarely appears (almost never)
+	format TEXT, -- rarely appears (almost never)
 	year_began INTEGER,
 	year_ended INTEGER,
 	publication_dates CHAR(64),
@@ -58,12 +58,12 @@ CREATE TABLE Issue (
 	indicia_frequency CHAR(64),
 	editing TEXT,
 	notes TEXT,
-	-- isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any isbn in the file)
-	-- valid_isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any valid_isbn in the file)
-	-- barcode TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any barcode in the file)
-	-- title TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any title in the file)
+	isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any isbn in the file)
+	valid_isbn TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any valid_isbn in the file)
+	barcode TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any barcode in the file)
+	title TEXT, -- almost never appers, I put TEXT to be safe (because I didn't see any title in the file)
 	on_sale_date DATE, -- or CHAR(20) for example (but in the file, it was YYYY-MM-DD)
-	-- rating INTEGER, -- almost never appers, I put TEXT to be safe (because I didn't see any isbn in the file)
+	rating INTEGER, -- almost never appers, I put TEXT to be safe (because I didn't see any isbn in the file)
 	PRIMARY KEY (id),
 	FOREIGN KEY (series_id) REFERENCES Series(id),
 	FOREIGN KEY (indicia_publisher_id) REFERENCES Indicia_Publisher(id)
