@@ -96,13 +96,6 @@ CREATE TABLE Publisher (
 	FOREIGN KEY (country_id) REFERENCES Country(id)
 )
 
-CREATE TABLE Publisher_publishes_serie (
-	serie_id INTEGER NOT NULL,
-	publisher_id INTEGER NOT NULL,
-	PRIMARY KEY (serie_id, pubtype_id),
-	FOREIGN KEY (serie_id) REFERENCES Series(id),
-	FOREIGN KEY (publisher_id) REFERENCES Publisher(id)
-
 CREATE TABLE Brand_Group (
 	id INTEGER,
 	name TEXT,
