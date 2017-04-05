@@ -11,6 +11,7 @@ with open(filename, 'r') as f:
 
 baseName, extention = filename.split('.');
 nullCnt = {}
+emptyValues = ["null", "", "[nn]", "?", "[none]", "none"]
 
 
 for attribute in attributeNames:
@@ -24,7 +25,7 @@ with open(filename, 'r') as f, open(baseName + "_updated." + extention, "w") as 
 		lineNb += 1
 		newRow = {}
 		for attribute in attributeNames:
-			if row[attribute] == None or row[attribute] == "null" or row[attribute] == '':
+			if row[attribute] == None or row[attribute] in emptyValues:
 				newRow.update({attribute: "NULL"})
 				nullCnt.update({attribute: nullCnt[attribute] + 1})
 			else:
