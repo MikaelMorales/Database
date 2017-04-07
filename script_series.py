@@ -20,15 +20,10 @@ with open(filename, 'r') as f, open("series_cleaned.csv", "w") as newf:
 			if attribute == "publication_dates" and row[attribute] != "NULL":
 				pubDates = row[attribute]
 				cleanedPubDate = 0
-
-				if re.search(r"^(\d\d\d\d)(.*)$", pubDates):
-					cleanedPubDate = re.search(r"^(\d\d\d\d)(.*)$", pubDates).group(1)
-				elif re.search(r"^(\[)(\d\d\d\d)(])$", pubDates):
-					cleanedPubDate = re.search(r"^(\[)(\d\d\d\d)(])$", pubDates).group(2)
-				elif re.search(r"^([^\d\d\d\d]+)(\d\d\d\d)(.*)$", pubDates):
-					cleanedPubDate = re.search(r"^([^\d\d\d\d]+)(\d\d\d\d)(.*)$", pubDates).group(2)
-				elif re.search(r"\d{1, 3}", pubDates) or cleanedPubDate < year_began:
-					cleanedPubDate = year_began
+				if re.search(r"(\d\d\d\d)", pubDates):
+					cleanedPubDate = re.search(r"(\d\d\d\d)", pubDates).group(1)
+				elif re.search(r"(\d\d\d)([\?x])", pubDates):
+					cleanedPubDate = re.search(r"(\d\d\d)([\?x])", pubDates).group(1) + "0"
 				else:
 					print("""publication date : {}, id : {}""".format(pubDates, row["id"]))
 					cleanedPubDate = year_began
