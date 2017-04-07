@@ -79,9 +79,11 @@ with open(filename, 'r') as f, open("issue_cleaned.csv", "w") as newf:
 		dictWriter.writerow(newRow)
 
 with open("issue_cleaned.csv", 'r') as f:
-	pubDateCnt = 0
-	saleDateCnt = 0
-	priceCnt = 0
+
+	invalAttribCnt = {}
+	for attribute in attributeNames:
+		invalAttribCnt.update({attribute: 0})
+
 	dictReader = csv.DictReader(f)
 	for row in dictReader:
 		for attribute in attributeNames:
@@ -89,18 +91,26 @@ with open("issue_cleaned.csv", 'r') as f:
 				date = row[attribute]
 				if date != "NULL" and not re.search(r"^\d{4}$", date):
 					if attribute == "on_sale_date":
-						saleDateCnt += 1
+						invalAttribCnt[attribute] += 1
 					else:
-						pubDateCnt += 1
-					print(row["id"])
+						invalAttribCnt[attribute] += 1
+					print("""{} : {} : {}""".format(attribute, row["id"], row[attribute]))
 
 			if attribute == "price":
 				price = row[attribute]
 				if price != "NULL" and not re.search(r"^\d{1,5}\.\d{1,5}\s[A-Za-z]{3}$", price):
-					priceCnt += 1
-					print(row["id"])
+					invalAttribCnt[attribute] += 1
+					print("""{} : {} : {}""".format(attribute, row["id"], row[attribute]))
 
-	print("pub date counter = ", pubDateCnt)
-	print("sale date counter = ", saleDateCnt)
-	print("price counter = ", priceCnt)
+			if attribute == "series_id":
+				if row[attribute] == "NULL" or not re.search(r"^\d+$", row[attribute]):
+					invalAttribCnt[attribute] += 1
+
+			if attribute == "indicia_publisher_id":
+				if row[attribute] != "NULL" and not re.search(r"^\d+$", row[attribute]):
+					invalAttribCnt[attribute] += 1
+					print("""{} : {} : {}""".format(attribute, row["id"], row[attribute]))
+
+	for attribute in attributeNames:
+		print("""{} => {}""".format(attribute, invalAttribCnt[attribute]))
 
