@@ -17,8 +17,7 @@ with open(filename, 'r') as f:
 	dictReader = csv.DictReader(f, quoting=csv.QUOTE_NONE)
 	for row in dictReader:
 		for attribute in attributeNames:
-			if len(row[attribute]) > attributeSizeCnt[attribute]:
-				attributeSizeCnt[attribute] = len(row[attribute])
-
+			attributeSizeCnt[attribute] = max(attributeSizeCnt[attribute], len(row[attribute]))
+			
 for attribute in attributeNames:
 	print("""{} => {}""".format(attribute, attributeSizeCnt[attribute]))
