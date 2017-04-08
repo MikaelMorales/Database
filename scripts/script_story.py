@@ -28,7 +28,6 @@ with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:
 				cleanedAttribute = elem.lower()
 
 			elif attribute == "title" and elem != "NULL":
-				print("""{} replace by : {}""".format(elem, elem.replace('"', '')))
 				cleanedAttribute = elem.replace('"', '')
 
 			else:
