@@ -18,8 +18,9 @@ for attribute in attributeNames:
 	nullCnt.update({attribute: 0})
 
 with open(filename, 'r') as f, open(baseName + "_updated." + extention, "w") as newf:
-	dictReader = csv.DictReader(f)
-	dictWriter = csv.DictWriter(newf, attributeNames)
+	dictReader = csv.DictReader(f, quoting=csv.QUOTE_NONE)
+	# dictWriter = csv.DictWriter(newf, attributeNames, quoting=csv.QUOTE_NONE, escapechar='\\')
+	dictWriter = csv.DictWriter(newf, attributeNames, delimiter=',')
 	dictWriter.writeheader()
 	for row in dictReader:
 		lineNb += 1
