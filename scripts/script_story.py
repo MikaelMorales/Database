@@ -24,7 +24,7 @@ with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:
 				else: 
 					cleanedAttribute = elem
 
-			elif attribute == "genre":
+			elif attribute == "genre" and elem != "NULL":
 				cleanedAttribute = elem.lower()
 
 			elif attribute == "title" and elem != "NULL":
