@@ -10,6 +10,11 @@ with open(filename, 'r') as f:
 	attributeNames = next(reader)
 	attributeNames.remove("characters")
 	attributeNames.remove("genre")
+	attributeNames.remove("script")
+	attributeNames.remove("pencils")
+	attributeNames.remove("inks")
+	attributeNames.remove("colors")
+
 
 with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:
 	dictReader = csv.DictReader(f)
