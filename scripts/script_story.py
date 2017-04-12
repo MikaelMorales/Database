@@ -14,6 +14,7 @@ with open(filename, 'r') as f:
 	attributeNames.remove("pencils")
 	attributeNames.remove("inks")
 	attributeNames.remove("colors")
+	attributeNames.remove("feature")
 
 
 with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:

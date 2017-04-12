@@ -4,7 +4,7 @@ import sys
 
 ## Take long to execute !!!!!!!
 
-filename = "story_cleaned.csv"
+filename = "issue_cleaned.csv"
 
 attributeNames = []
 
@@ -13,64 +13,39 @@ with open(filename, 'r') as f:
 	attributeNames = next(reader)
 
 
-def getCleanedArtist(artist, id):
-	artRegex1 = re.search(r"^([A-Za-z\s]+:)?([^\]\[\(\);]+).*$", artist)
-	artRegex2 = re.search(r"^[\[\(]([A-Z][\w\s\.]+)[\)\]]\s?$", artist)
+def getCleanedColor(color, id):
+	colorRegex = re.search(r"^;?\s*([A-Za-z-\s&]+);?\s?$", genre)
+	if colorRegex:
+		cleanedColor = colorRegex.group(1)
 
-	if artRegex1 or artRegex2:
-		if artRegex1:
-			cleanedArtist = artRegex1.group(2)
-		else: 
-			cleanedArtist = artRegex2.group(1)
-		
-		return cleanedArtist
+		return cleanedColor
 
 	else:
-		print("""{} => {} : {}""".format("artists", id, artist))
+		print("""{} => {} : {}""".format("color", id, color))
 		return None
 
 
-def getCleanedChar(character, id):
-	character.replace(" and ", ";").replace(" & ", ";")
-	charRegex = re.search(r"^([A-Za-z\s]+:)?([^\]\[\(\);]+).*$", character)
-	if charRegex:
-		cleanedChar = charRegex.group(2)
+def getCleanedDefault(item, id):
+	itemRegex1 = re.search(r"^([A-Za-z\s]+:)?([^\]\[\(\);]+).*$", item)
+	itemRegex2 = re.search(r"^[\[\(]([A-Z][\w\s\.]+)[\)\]]\s?$", item)
+	itemRegex3 = re.search(r"^\[([A-Za-z\s]+)\(.*\)\]$", item)
 
-		return cleanedChar
-
-	else:
-		print("""{} => {} : {}""".format("characters", id, character))
-		return None
-
-
-def getCleanedGenre(genre, id):
-	genreRegex = re.search(r"^;?\s*([A-Za-z-\s&]+);?\s?$", genre)
-	if genreRegex:
-		cleanedGenre = genreRegex.group(1)
-
-		return cleanedGenre
-
-	else:
-		print("""{} => {} : {}""".format("genre", id, genre))
-		return None
-
-
-def getCleanedFeature(feature, id):
-	feature.replace(" and ", ";").replace(" & ", ";")
-	featureRegex1 = re.search(r"^([A-Za-z\s]+:)?([^\]\[\(\);]+).*$", feature)
-	featureRegex2 = re.search(r"^\[([\w\'\.\sÖ&åäø\-’]+)\]$", feature)
-	if featureRegex1 or featureRegex2:
-		if featureRegex1: 
-			cleanedFeature = featureRegex1.group(2)
+	if itemRegex1 or itemRegex2 or itemRegex3:
+		if itemRegex1:
+			cleanedItem = itemRegex1.group(2)
+		elif itemRegex2: 
+			cleanedItem = itemRegex2.group(1)
 		else:
-			cleanedFeature = featureRegex2.group(1)
+			cleanedItem = itemRegex3.group(1)
 
-		return cleanedFeature
+		if cleanedItem == ' ':
+			return None
+		else:
+			return cleanedItem
 
 	else:
-		print("""{} => {} : {}""".format("features", id, feature))
+		print("""{} : {}""".format(id, item))
 		return None
-
 
 
 def writeRelFiles(newEntityFileName, newRelationFileName, header, attributes, getCleanedItem):
@@ -123,10 +98,8 @@ def writeRelFiles(newEntityFileName, newRelationFileName, header, attributes, ge
 
 
 
-# GET GENRE
-# writeRelFiles("story_genres.csv", "story_has_genres.csv", ['story_id', 'genre_id'], ['genre'], getCleanedGenre)
+writeRelFiles("issue_editing.csv", "issue_has_editing.csv", ['issue_id', 'editing_id'], ['editing'], getCleanedDefault)
 
-# GET FEATURES
-writeRelFiles("story_features.csv", "story_has_features.csv", ['story_id', 'feature_id'], ['feature'], getCleanedFeature)
+
 
 
