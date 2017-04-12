@@ -8,6 +8,8 @@ attributeNames = []
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
 	attributeNames = next(reader)
+	attributeNames.remove("characters")
+	attributeNames.remove("genre")
 
 with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:
 	dictReader = csv.DictReader(f)
@@ -24,11 +26,14 @@ with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:
 				else: 
 					cleanedAttribute = elem
 
-			elif attribute == "genre":
+			elif attribute == "genre" and elem != "NULL":
 				cleanedAttribute = elem.lower()
 
 			elif attribute == "title" and elem != "NULL":
 				cleanedAttribute = elem.replace('"', '')
+
+			elif attribute == "characters" and elem != "NULL":
+				cleanedAttribute = elem.replace("&", ";").replace(" and ", ";")
 
 			else:
 				cleanedAttribute = elem
