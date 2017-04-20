@@ -49,17 +49,22 @@
 			<integer>1</integer>
 			<key>contentSelection</key>
 			<data>
-			YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFy
-			Y2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJX
-			TlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAF
-			gAdUdHlwZVRyb3dzXxAdU2VsZWN0aW9uRGV0YWlsVHlwZU5TSW5k
-			ZXhTZXTSFwsYGVxOU1JhbmdlQ291bnQQAIAG0hscHR5aJGNsYXNz
-			bmFtZVgkY2xhc3Nlc1pOU0luZGV4U2V0oh8gWk5TSW5kZXhTZXRY
-			TlNPYmplY3TSGxwiI1xOU0RpY3Rpb25hcnmiIiBfEA9OU0tleWVk
-			QXJjaGl2ZXLRJidUZGF0YYABAAgAEQAaACMALQAyADcAQABGAE0A
-			VQBgAGcAagBsAG4AcQBzAHUAdwB8AIEAoQCmALMAtQC3ALwAxwDQ
-			ANsA3gDpAPIA9wEEAQcBGQEcASEAAAAAAAACAQAAAAAAAAAoAAAA
-			AAAAAAAAAAAAAAABIw==
+			YnBsaXN0MDDUAQIDBAUGOjtYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoK4HCBUWFxgZHSQpLTE0OFUkbnVsbNMJ
+			CgsMEBRXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6MNDg+AAoAD
+			gASjERITgAWABoAIgA1UdHlwZVRyb3dzVGtleXNfECZTZWxlY3Rp
+			b25EZXRhaWxUeXBlUHJpbWFyeUtleWVkRGV0YWlsc9MJCgsaGxyg
+			oIAH0h4fICFaJGNsYXNzbmFtZVgkY2xhc3Nlc18QE05TTXV0YWJs
+			ZURpY3Rpb25hcnmjICIjXE5TRGljdGlvbmFyeVhOU09iamVjdNIK
+			CyUooiYngAmAC4AM0gsqKyxZTlMuc3RyaW5ngApZb3JpZ2luX2lk
+			0h4fLi9fEA9OU011dGFibGVTdHJpbmejLjAjWE5TU3RyaW5n0gsq
+			KzOACll0YXJnZXRfaWTSHh81Nl5OU011dGFibGVBcnJheaM1NyNX
+			TlNBcnJhedIeHyI5oiIjXxAPTlNLZXllZEFyY2hpdmVy0Tw9VGRh
+			dGGAAQAIABEAGgAjAC0AMgA3AEYATABTAFsAZgBtAHEAcwB1AHcA
+			ewB9AH8AgQCDAIgAjQCSALsAwgDDAMQAxgDLANYA3wD1APkBBgEP
+			ARQBFwEZARsBHQEiASwBLgE4AT0BTwFTAVwBYQFjAW0BcgGBAYUB
+			jQGSAZUBpwGqAa8AAAAAAAACAQAAAAAAAAA+AAAAAAAAAAAAAAAA
+			AAABsQ==
 			</data>
 			<key>contentSortColIsAsc</key>
 			<true/>
@@ -331,8 +336,9 @@ CREATE TABLE Issue_Reprint (
 	PRIMARY KEY (origin_id, target_id),
 	FOREIGN KEY (origin_id) REFERENCES Story(id),
 	FOREIGN KEY (target_id) REFERENCES Story(id)
-);
-</string>
+);</string>
+			<key>table</key>
+			<string>Story_Reprint</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
@@ -348,6 +354,13 @@ CREATE TABLE Issue_Reprint (
 	<key>queryHistory</key>
 	<array>
 		<string>CREATE TABLE Story_Reprint (
+	origin_id INT NOT NULL,
+	target_id INT NOT NULL,
+	PRIMARY KEY (origin_id, target_id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
+)</string>
+		<string>CREATE TABLE Issue_Reprint (
 	origin_id INT NOT NULL,
 	target_id INT NOT NULL,
 	PRIMARY KEY (origin_id, target_id),
@@ -449,11 +462,6 @@ CREATE TABLE Issue_Reprint (
 	PRIMARY KEY (series_id, binding_id),
 	FOREIGN KEY (series_id) REFERENCES Series(id),
 	FOREIGN KEY (binding_id) REFERENCES Serie_Binding(id)
-)</string>
-		<string>CREATE TABLE Serie_Binding (
-	id INT NOT NULL,
-	name VARCHAR(32),
-	PRIMARY KEY (id)
 )</string>
 	</array>
 	<key>rdbms_type</key>
