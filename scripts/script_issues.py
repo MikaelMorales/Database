@@ -8,7 +8,7 @@ attributeNames = []
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
 	attributeNames = next(reader)
-	attributeNames.remove("editing")
+	# attributeNames.remove("editing")
 
 with open(filename, 'r') as f, open("issue_cleaned.csv", "w") as newf:
 	dictReader = csv.DictReader(f)

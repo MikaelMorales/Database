@@ -8,13 +8,13 @@ attributeNames = []
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
 	attributeNames = next(reader)
-	attributeNames.remove("characters")
-	attributeNames.remove("genre")
-	attributeNames.remove("script")
-	attributeNames.remove("pencils")
-	attributeNames.remove("inks")
-	attributeNames.remove("colors")
-	attributeNames.remove("feature")
+	# attributeNames.remove("characters")
+	# attributeNames.remove("genre")
+	# attributeNames.remove("script")
+	# attributeNames.remove("pencils")
+	# attributeNames.remove("inks")
+	# attributeNames.remove("colors")
+	# attributeNames.remove("feature")
 
 
 with open(filename, 'r') as f, open("story_cleaned.csv", "w") as newf:

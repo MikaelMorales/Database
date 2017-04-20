@@ -13,18 +13,6 @@ with open(filename, 'r') as f:
 	attributeNames = next(reader)
 
 
-def getCleanedColor(color, id):
-	colorRegex = re.search(r"^;?\s*([A-Za-z-\s&]+);?\s?$", genre)
-	if colorRegex:
-		cleanedColor = colorRegex.group(1)
-
-		return cleanedColor
-
-	else:
-		print("""{} => {} : {}""".format("color", id, color))
-		return None
-
-
 def getCleanedDefault(item, id):
 	itemRegex1 = re.search(r"^([A-Za-z\s]+:)?([^\]\[\(\);]+).*$", item)
 	itemRegex2 = re.search(r"^[\[\(]([A-Z][\w\s\.]+)[\)\]]\s?$", item)
@@ -48,7 +36,7 @@ def getCleanedDefault(item, id):
 		return None
 
 
-def writeRelFiles(newEntityFileName, newRelationFileName, header, attributes, getCleanedItem):
+def writeRelFiles(newEntityFileName, newRelationFileName, header, attribute, getCleanedItem):
 	addedItem = []
 	itemCnt = 0
 
@@ -62,32 +50,36 @@ def writeRelFiles(newEntityFileName, newRelationFileName, header, attributes, ge
 		relationWriter.writeheader()
 
 		for row in reader:
-			for attribute in attributes:
-				elem = row[attribute]
-				if elem != "NULL":
-					elem = row[attribute].replace(';;',';')
-					regex = r"^([^;]+)(;[^;]+)*;?$"
+			elem = row[attribute]
+			if elem != "NULL":
+				elem = row[attribute].replace(';;',';')
+				regex = r"^([^;]+)(;[^;]+)*;?$"
 
-					if not re.search(regex, elem):
-						print(elem)
+				if not re.search(regex, elem):
+					print(elem)
 
-					elif re.search(regex, elem):
-						groupTuples = re.findall(regex, elem)
-						for t in groupTuples:
-							for c in t:
-								if c != '':
-									item = c.replace('; ', '').replace('"','').replace('?','')
+				elif re.search(regex, elem):
+					groupTuples = re.findall(regex, elem)
+					for t in groupTuples:
+						for c in t:
+							if c != '':
+								item = c.replace('; ', '').replace('"','').replace('?','')
 
-									if re.search(r"^;(.*)$", item):
-										item = re.search(r"^;(.*)$", item).group(1)
+								if re.search(r"^;(.*)$", item):
+									item = re.search(r"^;(.*)$", item).group(1)
 
-									if item != '':
+								if item != '':
 
-										cleanedItem = getCleanedItem(item, row['id'])
+									cleanedItem = getCleanedItem(item, row['id'])
 
-										if cleanedItem != None:
-											
-											if cleanedItem != '':
+									if cleanedItem != None:
+
+										spaceRegex = re.search(r"^\s*([^\s]+\s*[^\s]+)\s*$", cleanedItem)
+
+										if spaceRegex:
+											cleanedItem = spaceRegex.group(1)
+										
+											if cleanedItem != None and cleanedItem != '' and cleanedItem != ' ':
 												if cleanedItem.lower() not in addedItem:
 													addedItem.append(cleanedItem.lower())
 													writer.writerow({'id': itemCnt, 'name': cleanedItem})
@@ -98,8 +90,6 @@ def writeRelFiles(newEntityFileName, newRelationFileName, header, attributes, ge
 
 
 
-writeRelFiles("issue_editing.csv", "issue_has_editing.csv", ['issue_id', 'editing_id'], ['editing'], getCleanedDefault)
+# writeRelFiles("issue_editing.csv", "issue_has_editing.csv", ['issue_id', 'editing_id'], 'editing', getCleanedDefault)
 
-
-
-
+writeRelFiles("issue_colors.csv", "issue_has_colors.csv", ['issue_id', 'color_id'], 'color', getCleanedDefault)

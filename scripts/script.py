@@ -12,7 +12,7 @@ with open(filename, 'r') as f:
 
 baseName, extention = filename.split('.');
 nullCnt = {}
-emptyValues = ["null", "", "[nn]", "?", "NONE", "[none]", "none", "[undated]", "[no date]", "[No date]", "[?]", "[ongedateerd]", "[Unknown]", "[none given]", "none given", "[none listed]", "None listed", "None Listed", "no date", "Unknown", "[None]", "None [Premium]", "Premium [None]", "None", "nessuno", "na", "0?", "0 ?", "N/A", "n/a", "[aucun]", "[NONE]", "[none", "[ohne]", "uvurderlig", "[none] (see notes)", "[None see notes]", "[none?]", "none shown", "None Shown", "None indicated", "[none]s", "no coverpr", "see note", "[no price listed]", "[aucun indiqué]", "[see note]", "none listed", "(see Notes)", "0.00 [None]", "[esc 000]", "[None] (See Notes)", "[see notes]", "[none] (see note)"]
+emptyValues = ["NULL", "null", "", "[nn]", "?", "NONE", "[none]", "none", "[undated]", "[no date]", "[No date]", "[?]", "[ongedateerd]", "[Unknown]", "[none given]", "none given", "[none listed]", "None listed", "None Listed", "no date", "Unknown", "[None]", "None [Premium]", "Premium [None]", "None", "nessuno", "na", "0?", "0 ?", "N/A", "n/a", "[aucun]", "[NONE]", "[none", "[ohne]", "uvurderlig", "[none] (see notes)", "[None see notes]", "[none?]", "none shown", "None Shown", "None indicated", "[none]s", "no coverpr", "see note", "[no price listed]", "[aucun indiqué]", "[see note]", "none listed", "(see Notes)", "0.00 [None]", "[esc 000]", "[None] (See Notes)", "[see notes]", "[none] (see note)"]
 illId = 0
 
 for attribute in attributeNames:
