@@ -6,7 +6,7 @@ filename = input("filename (only file containing reprint): ")
 baseName, extention = filename.split('.');
 baseName = baseName.replace("_updated", "")
 
-attributeNames = []
+attributeNames = set()
 
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
@@ -17,7 +17,7 @@ newName = baseName + "_cleaned." + extention
 
 with open(filename, 'r') as f, open(newName, "w") as newf:
 	dictReader = csv.DictReader(f)
-	dictWriter = csv.DictWriter(newf, attributeNames, delimiter=',')
+	dictWriter = csv.DictWriter(newf, ["origin_id", "target_id"], delimiter=',')
 	dictWriter.writeheader()
 
 	for row in dictReader:
@@ -25,22 +25,21 @@ with open(filename, 'r') as f, open(newName, "w") as newf:
 		for attribute in attributeNames:
 			elem = row[attribute]
 			if elem != "NULL":
-				if attribute in ["origin_id", "target_id", "origin_issue_id", "target_issue_id"]:
-					if not re.search(r"^\d+$", elem):
-						print("""{} : {} : {}""".format(attribute, row["id"], elem))
+				if not re.search(r"^\d+$", elem):
+					print("""{} : {} : {}""".format(attribute, row["id"], elem))
 
-					cleanedAttribute = elem
-					newRow.update({attribute: cleanedAttribute})
+				cleanedAttribute = elem
+				newRow.update({attribute: cleanedAttribute})
 
 		dictWriter.writerow(newRow)
 
 with open(newName, 'r') as f, open("new_reprint.csv", "w") as newf:
-	reader = csv.reader(f)
+	reader = csv.DictReader(f)
 	writer = csv.writer(newf)
 
-	rows = []
+	rows = set()
 
 	for row in reader:
-		if row not in rows:
+		if row["origin_id"] not in rows:
 			writer.writerow(row)
-			rows.append(row)
+			rows.add(row["origin_id"])

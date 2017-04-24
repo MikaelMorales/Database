@@ -3,7 +3,7 @@ import re
 
 filename = "series_updated.csv";
 
-attributeNames = []
+attributeNames = set()
 
 with open(filename, 'r') as f:
 	reader = csv.reader(f)

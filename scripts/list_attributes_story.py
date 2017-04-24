@@ -6,9 +6,9 @@ import sys
 
 filename = "story_cleaned.csv"
 
-attributeNames = []
+attributeNames = set()
 
-addedArtists = []
+addedArtists = {}
 artistCnt = 0
 
 with open(filename, 'r') as f:
@@ -124,25 +124,27 @@ def writeRelFiles(newEntityFileName, newRelationFileName, header, attribute, get
 
 											if cleanedItem != None and cleanedItem != '' and cleanedItem != ' ': 
 												if cleanedItem.lower() not in addedItem:
-													addedItem.append(cleanedItem.lower())
+													addedItem.update({cleanedItem.lower(): itemCnt})
 													writer.writerow({'id': itemCnt, 'name': cleanedItem})
 													itemCnt += 1
 
-												if (row["id"], addedItem.index(cleanedItem.lower())) not in addedRel:
-													addedRel.add((row["id"], addedItem.index(cleanedItem.lower())))
-													relationWriter.writerow({header[0]: row["id"], header[1]: addedItem.index(cleanedItem.lower())})
+												addedItemId = addedItem.get(cleanedItem.lower())
+
+												if (row["id"], addedItemId) not in addedRel:
+													addedRel.add((row["id"], addedItemId))
+													relationWriter.writerow({header[0]: row["id"], header[1]: addedItemId})
 	return itemCnt
 
 
 
 # # GET GENRE
-# writeRelFiles("story_genres.csv", "story_has_genres.csv", ['story_id', 'genre_id'], 'genre', getCleanedGenre, [], 0, False)
+# writeRelFiles("story_genres.csv", "story_has_genres.csv", ['story_id', 'genre_id'], 'genre', getCleanedGenre, {}, 0, False)
 
 # # GET FEATURES
-# writeRelFiles("story_features.csv", "story_has_features.csv", ['story_id', 'feature_id'], 'feature', getCleanedFeature, [], 0, False)
+# writeRelFiles("story_features.csv", "story_has_features.csv", ['story_id', 'feature_id'], 'feature', getCleanedFeature, {}, 0, False)
 
 # # GET CHARACTERS
-# writeRelFiles("story_characters.csv", "story_has_characters.csv", ['story_id', 'character_id'], 'characters', getCleanedDefault, [], 0, False)
+# writeRelFiles("story_characters.csv", "story_has_characters.csv", ['story_id', 'character_id'], 'characters', getCleanedDefault, {}, 0, False)
 
 # GET ARTISTS
 artistCnt = writeRelFiles("story_artists.csv", "story_has_inks.csv", ['story_id', 'artist_id'], 'inks', getCleanedArtist, addedArtists, artistCnt, False)

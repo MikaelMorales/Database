@@ -6,7 +6,7 @@ filename = input("filename (only file containing publisher and brand group): ")
 baseName, extention = filename.split('.');
 baseName = baseName.replace("_updated", "")
 
-attributeNames = []
+attributeNames = set()
 
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
@@ -22,7 +22,7 @@ with open(filename, 'r') as f, open(baseName + "_cleaned." + extention, "w") as 
 			elem = row[attribute]
 			cleanedAttribute = elem
 			if elem != "NULL":
-				if attribute in ["country_id", "publisher_id"]:
+				if attribute in set(["country_id", "publisher_id"]):
 					if not re.search(r"^\d+$", elem):
 						print("""{} : {} : {}""".format(attribute, row["id"], elem))
 						cleanedAttribute = "NULL"

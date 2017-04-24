@@ -6,7 +6,7 @@ import sys
 
 filename = "issue_cleaned.csv"
 
-attributeNames = []
+attributeNames = set()
 
 with open(filename, 'r') as f:
 	reader = csv.reader(f)
@@ -37,7 +37,7 @@ def getCleanedDefault(item, id):
 
 
 def writeRelFiles(newEntityFileName, newRelationFileName, header, attribute, getCleanedItem):
-	addedItem = []
+	addedItem = {}
 	itemCnt = 0
 
 	with open(filename, 'r') as f, open(newEntityFileName, "w") as charFile, open(newRelationFileName, "w") as relationFile:
@@ -81,15 +81,15 @@ def writeRelFiles(newEntityFileName, newRelationFileName, header, attribute, get
 										
 											if cleanedItem != None and cleanedItem != '' and cleanedItem != ' ':
 												if cleanedItem.lower() not in addedItem:
-													addedItem.append(cleanedItem.lower())
+													addedItem.update({cleanedItem.lower(): itemCnt})
 													writer.writerow({'id': itemCnt, 'name': cleanedItem})
 													itemCnt += 1
 
-												relationWriter.writerow({header[0]: row["id"], header[1]: addedItem.index(cleanedItem.lower())})
+												relationWriter.writerow({header[0]: row["id"], header[1]: addedItem.get(cleanedItem.lower())})
 
 
 
 
-# writeRelFiles("issue_editing.csv", "issue_has_editing.csv", ['issue_id', 'editing_id'], 'editing', getCleanedDefault)
+writeRelFiles("issue_editing.csv", "issue_has_editing.csv", ['issue_id', 'editing_id'], 'editing', getCleanedDefault)
 
-writeRelFiles("issue_colors.csv", "issue_has_colors.csv", ['issue_id', 'color_id'], 'color', getCleanedDefault)
+# writeRelFiles("issue_colors.csv", "issue_has_colors.csv", ['issue_id', 'color_id'], 'color', getCleanedDefault)
