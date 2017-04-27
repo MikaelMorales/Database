@@ -139,6 +139,9 @@ CREATE TABLE Series (
 	FOREIGN KEY (publication_type_id) REFERENCES Series_Publication_Type(id)
 );
 
+ALTER TABLE Issue ADD CONSTRAINT series_id FOREIGN KEY (series_id) REFERENCES Series(id);
+
+
 CREATE TABLE Serie_Binding (
 	id INT NOT NULL,
 	name VARCHAR(32),
