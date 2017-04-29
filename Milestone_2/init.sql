@@ -1,15 +1,6 @@
--- Si vous avez des erreurs de type duplicate Primary Key, dites moi j'ai les tables nettoyé
--- sur mon ordi, mais je peux pas les push sur github.
-
 CREATE TABLE Story_Type (
 	id INT NOT NULL,
 	name VARCHAR(40),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Series_Publication_Type (
-	id INT NOT NULL,
-	name VARCHAR(16), 
 	PRIMARY KEY (id)
 );
 
@@ -17,6 +8,12 @@ CREATE TABLE Country (
 	id INT NOT NULL,
 	code VARCHAR(4),
 	name VARCHAR(40),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Series_Publication_Type (
+	id INT NOT NULL,
+	name VARCHAR(16),
 	PRIMARY KEY (id)
 );
 
@@ -66,24 +63,55 @@ CREATE TABLE Indicia_Publisher (
 	FOREIGN KEY (country_id) REFERENCES Country(id)
 );
 
--- METTRE TYPE ASCII QUAND VOUS IMPORTER
 CREATE TABLE Issue (
 	id INT NOT NULL,
+	number VARCHAR(64),
 	series_id INT,
-	issue_number VARCHAR(64),
 	indicia_publisher_id INT,
-	publication_date VARCHAR(64),
+	publication_date INT,
 	price VARCHAR(16),
 	page_count INT,
-	indicia_frequency VARCHAR(256),
+	indicia_frequency VARCHAR(160),
 	notes TEXT,
-	on_sale_date INT,
 	isbn VARCHAR(64),
 	valid_isbn VARCHAR(64),
 	barcode VARCHAR(64),
-	title VARCHAR(256),
+	title VARCHAR(128),
+	on_sale_date INT,
+	rating VARCHAR(128),
 	PRIMARY KEY (id),
+/* 	FOREIGN KEY (series_id) REFERENCES Series(id), */
 	FOREIGN KEY (indicia_publisher_id) REFERENCES Indicia_Publisher(id)
+);
+
+
+CREATE TABLE Issue_Editing (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Issue_Has_Editing (
+	 issue_id INT NOT NULL,
+	 editing_id INT NOT NULL,
+	 PRIMARY KEY (issue_id, editing_id),
+	 FOREIGN KEY (issue_id) REFERENCES Issue(id),
+	 FOREIGN KEY (editing_id) REFERENCES Issue_Editing(id)
+);
+
+CREATE TABLE Story (
+	id INT NOT NULL,
+	title VARCHAR(512),
+	issue_id INT,
+	letters TEXT,
+	editing VARCHAR(512),
+	synopsis TEXT,
+	reprint_notes TEXT,
+	notes TEXT,
+	type_id INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (issue_id) REFERENCES Issue(id),
+	FOREIGN KEY (type_id) REFERENCES Story_Type(id)
 );
 
 CREATE TABLE Series (
@@ -113,119 +141,39 @@ CREATE TABLE Series (
 
 ALTER TABLE Issue ADD CONSTRAINT series_id FOREIGN KEY (series_id) REFERENCES Series(id);
 
-CREATE TABLE Issue_Editing (
+
+CREATE TABLE Serie_Binding (
 	id INT NOT NULL,
-	name VARCHAR(256),
+	name VARCHAR(32),
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE Issue_Has_Editing (
-	issue_id INT NOT NULL,
-	editing_id INT NOT NULL,
-	PRIMARY KEY (issue_id, editing_id),
-	FOREIGN KEY (issue_id) REFERENCES Issue(id),
-	FOREIGN KEY (editing_id) REFERENCES Issue_Editing(id)
-);
-
-CREATE TABLE Series_Binding (
-	id INT NOT NULL,
-	name VARCHAR(64),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Series_Color (
-	id INT NOT NULL,
-	name VARCHAR(128),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Series_Has_Binding (
+CREATE TABLE Serie_Has_Binding (
 	series_id INT NOT NULL,
 	binding_id INT NOT NULL,
 	PRIMARY KEY (series_id, binding_id),
 	FOREIGN KEY (series_id) REFERENCES Series(id),
-	FOREIGN KEY (binding_id) REFERENCES Series_Binding(id)
+	FOREIGN KEY (binding_id) REFERENCES Serie_Binding(id)
 );
 
-CREATE TABLE Series_Has_Color (
-	series_id INT NOT NULL,
-	color_id INT NOT NULL,
-	PRIMARY KEY (series_id, color_id),
-	FOREIGN KEY (series_id) REFERENCES Series(id),
-	FOREIGN KEY (color_id) REFERENCES Series_Color(id)
-);
-
-CREATE TABLE Series_Paper_Stock (
-	id INT NOT NULL,
-	name VARCHAR(128),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Series_Has_Paper_Stock (
-	series_id INT NOT NULL,
-	paper_stock_id INT NOT NULL,
-	PRIMARY KEY (series_id, paper_stock_id),
-	FOREIGN KEY (series_id) REFERENCES Series(id),
-	FOREIGN KEY (paper_stock_id) REFERENCES Series_Paper_Stock(id)
-);
-
--- A PARTIR D'ICI J'AI PAS IMPORTER NI CREER, JUSTE DEJA ECRIS LES QUERIES
-
--- PAS SUR DU CHAMP EDITING, dans Issue on a crée une autre table.
-CREATE TABLE Story (
-	id INT NOT NULL,
-	title VARCHAR(512),
-	issue_id INT NOT NULL,
-	letters TEXT,
-	editing VARCHAR(512),
-	synopsis TEXT,
-	reprint_notes TEXT,
-	notes TEXT,
-	type_id INT NOT NULL,
-	PRIMARY KEY (id),
-	FOREIGN KEY (issue_id) REFERENCES Issue(id),
-	FOREIGN KEY (type_id) REFERENCES Story_Type(id)
-);
-
-CREATE TABLE Story_Artists (
-	id INT NOT NULL,
-	name VARCHAR(128),
-	PRIMARY KEY (id)
-);
-
--- BIZARRE ??? le nom le plus long est: 1817 !!!!
-CREATE TABLE Story_Characters (
-	id INT NOT NULL,
-	name TEXT,
-	PRIMARY KEY (id)
-); 
-
-CREATE TABLE Story_Features (
-	id INT NOT NULL,
-	name VARCHAR(258),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Story_Genres (
+CREATE TABLE Serie_Colors (
 	id INT NOT NULL,
 	name VARCHAR(64),
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE Story_Has_Artists (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY (story_id) REFERENCES Story(id),
-	FOREIGN KEY (artist_id) REFERENCES Story_Artists(id)
+CREATE TABLE Serie_Has_Colors (
+	series_id INT NOT NULL,
+	color_id INT NOT NULL,
+	PRIMARY KEY (series_id, color_id),
+	FOREIGN KEY (series_id) REFERENCES Series(id),
+	FOREIGN KEY (color_id) REFERENCES Serie_Colors(id)
 );
 
-CREATE TABLE Story_Has_Characters (
-	story_id INT NOT NULL,
-	character_id INT NOT NULL,
-	PRIMARY KEY (story_id, character_id),
-	FOREIGN KEY (story_id) REFERENCES Story(id),
-	FOREIGN KEY (character_id) REFERENCES Story_Characters(id)
+CREATE TABLE Story_Features (
+	id INT NOT NULL,
+	name VARCHAR(64),
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE Story_Has_Features (
@@ -236,26 +184,84 @@ CREATE TABLE Story_Has_Features (
 	FOREIGN KEY (feature_id) REFERENCES Story_Features(id)
 );
 
+CREATE TABLE Story_Artists (
+	id INT NOT NULL,
+	name VARCHAR(64),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Story_Has_Inks (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Colors (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Pencils (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Scripts (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Genres (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY(id)
+);
+
 CREATE TABLE Story_Has_Genres (
 	story_id INT NOT NULL,
 	genre_id INT NOT NULL,
-	PRIMARY KEY (story_id, genre_id),
-	FOREIGN KEY (story_id) REFERENCES Story(id),
-	FOREIGN KEY (genre_id) REFERENCES Story_Genres(id)
+	PRIMARY KEY(story_id, genre_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(genre_id) REFERENCES Story_Genres(id)
 );
 
-
--- A PARTIR D'ICI C'EST DE LA MERDE !
-
--- Ces deux c'est a voir, vu ce qu'on a reçu dans le feedback !!!!
-CREATE TABLE Story_Reprint (
+CREATE TABLE Story_Characters (
 	id INT NOT NULL,
+	name VARCHAR(2048),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Story_Has_Characters (
+	story_id INT NOT NULL,
+	character_id INT NOT NULL,
+	PRIMARY KEY(story_id, character_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(character_id) REFERENCES Story_Characters(id)
+);
+
+CREATE TABLE Story_Reprint (
 	origin_id INT NOT NULL,
 	target_id INT NOT NULL,
+	PRIMARY KEY (origin_id, target_id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
 );
 
 CREATE TABLE Issue_Reprint (
-	id INT NOT NULL,
-	origin_issue_id INT NOT NULL,
-	target_issue_id INT NOT NULL,
+	origin_id INT NOT NULL,
+	target_id INT NOT NULL,
+	PRIMARY KEY (origin_id, target_id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
 );
