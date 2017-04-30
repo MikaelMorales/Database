@@ -49,27 +49,26 @@
 			<integer>1</integer>
 			<key>contentSelection</key>
 			<data>
-			YnBsaXN0MDDUAQIDBAUGOjtYJHZlcnNpb25YJG9iamVjdHNZJGFy
-			Y2hpdmVyVCR0b3ASAAGGoK4HCBUWFxgZHSQpLTE0OFUkbnVsbNMJ
-			CgsMEBRXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6MNDg+AAoAD
-			gASjERITgAWABoAIgA1UdHlwZVRyb3dzVGtleXNfECZTZWxlY3Rp
-			b25EZXRhaWxUeXBlUHJpbWFyeUtleWVkRGV0YWlsc9MJCgsaGxyg
-			oIAH0h4fICFaJGNsYXNzbmFtZVgkY2xhc3Nlc18QE05TTXV0YWJs
-			ZURpY3Rpb25hcnmjICIjXE5TRGljdGlvbmFyeVhOU09iamVjdNIK
-			CyUooiYngAmAC4AM0gsqKyxZTlMuc3RyaW5ngApZb3JpZ2luX2lk
-			0h4fLi9fEA9OU011dGFibGVTdHJpbmejLjAjWE5TU3RyaW5n0gsq
-			KzOACll0YXJnZXRfaWTSHh81Nl5OU011dGFibGVBcnJheaM1NyNX
-			TlNBcnJhedIeHyI5oiIjXxAPTlNLZXllZEFyY2hpdmVy0Tw9VGRh
-			dGGAAQAIABEAGgAjAC0AMgA3AEYATABTAFsAZgBtAHEAcwB1AHcA
-			ewB9AH8AgQCDAIgAjQCSALsAwgDDAMQAxgDLANYA3wD1APkBBgEP
-			ARQBFwEZARsBHQEiASwBLgE4AT0BTwFTAVwBYQFjAW0BcgGBAYUB
-			jQGSAZUBpwGqAa8AAAAAAAACAQAAAAAAAAA+AAAAAAAAAAAAAAAA
-			AAABsQ==
+			YnBsaXN0MDDUAQIDBAUGNjdYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoK0HCBUWFxgZHSQoLDA0VSRudWxs0wkK
+			CwwQFFdOUy5rZXlzWk5TLm9iamVjdHNWJGNsYXNzow0OD4ACgAOA
+			BKMREhOABYAGgAiADFR0eXBlVHJvd3NUa2V5c18QJlNlbGVjdGlv
+			bkRldGFpbFR5cGVQcmltYXJ5S2V5ZWREZXRhaWxz0wkKCxobHKCg
+			gAfSHh8gIVokY2xhc3NuYW1lWCRjbGFzc2VzXxATTlNNdXRhYmxl
+			RGljdGlvbmFyeaMgIiNcTlNEaWN0aW9uYXJ5WE5TT2JqZWN00goL
+			JSehJoAJgAvSCykqK1lOUy5zdHJpbmeAClJpZNIeHy0uXxAPTlNN
+			dXRhYmxlU3RyaW5noy0vI1hOU1N0cmluZ9IeHzEyXk5TTXV0YWJs
+			ZUFycmF5ozEzI1dOU0FycmF50h4fIjWiIiNfEA9OU0tleWVkQXJj
+			aGl2ZXLRODlUZGF0YYABAAgAEQAaACMALQAyADcARQBLAFIAWgBl
+			AGwAcAByAHQAdgB6AHwAfgCAAIIAhwCMAJEAugDBAMIAwwDFAMoA
+			1QDeAPQA+AEFAQ4BEwEVARcBGQEeASgBKgEtATIBRAFIAVEBVgFl
+			AWkBcQF2AXkBiwGOAZMAAAAAAAACAQAAAAAAAAA6AAAAAAAAAAAA
+			AAAAAAABlQ==
 			</data>
 			<key>contentSortColIsAsc</key>
 			<true/>
 			<key>contentViewport</key>
-			<string>{{0, 0}, {1080, 660}}</string>
+			<string>{{0, 0}, {600, 567}}</string>
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
@@ -214,6 +213,305 @@ CREATE TABLE Series (
 	FOREIGN KEY (publication_type_id) REFERENCES Series_Publication_Type(id)
 );
 
+ALTER TABLE Issue ADD CONSTRAINT series_id FOREIGN KEY (series_id) REFERENCES Series(id);
+
+CREATE TABLE Serie_Binding (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Serie_Has_Binding (
+	series_id INT NOT NULL,
+	binding_id INT NOT NULL,
+	PRIMARY KEY (series_id, binding_id),
+	FOREIGN KEY (series_id) REFERENCES Series(id),
+	FOREIGN KEY (binding_id) REFERENCES Serie_Binding(id)
+);
+
+CREATE TABLE Serie_Colors (
+	id INT NOT NULL,
+	name VARCHAR(64),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Serie_Has_Colors (
+	series_id INT NOT NULL,
+	color_id INT NOT NULL,
+	PRIMARY KEY (series_id, color_id),
+	FOREIGN KEY (series_id) REFERENCES Series(id),
+	FOREIGN KEY (color_id) REFERENCES Serie_Colors(id)
+);
+
+CREATE TABLE Story_Features (
+	id INT NOT NULL,
+	name VARCHAR(64),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Story_Has_Features (
+	story_id INT NOT NULL,
+	feature_id INT NOT NULL,
+	PRIMARY KEY (story_id, feature_id),
+	FOREIGN KEY (story_id) REFERENCES Story(id),
+	FOREIGN KEY (feature_id) REFERENCES Story_Features(id)
+);
+
+CREATE TABLE Story_Paper_Stock (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Serie_Has_Paper_Stock (
+	story_id INT NOT NULL,
+	paper_stock_id INT NOT NULL,
+	PRIMARY KEY (story_id, paper_stock_id),
+	FOREIGN KEY (story_id) REFERENCES Story(id),
+	FOREIGN KEY (paper_stock_id) REFERENCES Story_Paper_Stock(id)
+);
+
+CREATE TABLE Story_Artists (
+	id INT NOT NULL,
+	name VARCHAR(64),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Story_Has_Inks (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Colors (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Pencils (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Has_Scripts (
+	story_id INT NOT NULL,
+	artist_id INT NOT NULL,
+	PRIMARY KEY (story_id, artist_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
+);
+
+CREATE TABLE Story_Genres (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Story_Has_Genres (
+	story_id INT NOT NULL,
+	genre_id INT NOT NULL,
+	PRIMARY KEY(story_id, genre_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(genre_id) REFERENCES Story_Genres(id)
+);
+
+CREATE TABLE Story_Characters (
+	id INT NOT NULL,
+	name VARCHAR(2048),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE Story_Has_Characters (
+	story_id INT NOT NULL,
+	character_id INT NOT NULL,
+	PRIMARY KEY(story_id, character_id),
+	FOREIGN KEY(story_id) REFERENCES Story(id),
+	FOREIGN KEY(character_id) REFERENCES Story_Characters(id)
+);
+
+CREATE TABLE Story_Reprint (
+	origin_id INT NOT NULL,
+	target_id INT NOT NULL,
+	PRIMARY KEY (origin_id, target_id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
+);
+
+CREATE TABLE Issue_Reprint (
+	origin_id INT NOT NULL,
+	target_id INT NOT NULL,
+	PRIMARY KEY (origin_id, target_id),
+	FOREIGN KEY (origin_id) REFERENCES Story(id),
+	FOREIGN KEY (target_id) REFERENCES Story(id)
+);
+</string>
+			<key>table</key>
+			<string>Serie_Paper_Stock</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>200</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>/* CREATE TABLE Story_Type (
+	id INT NOT NULL,
+	name VARCHAR(40),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Country (
+	id INT NOT NULL,
+	code VARCHAR(4),
+	name VARCHAR(40),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Series_Publication_Type (
+	id INT NOT NULL,
+	name VARCHAR(16),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Language (
+	id INT NOT NULL,
+	code VARCHAR(4),
+	name VARCHAR(40),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Publisher (
+	id INT NOT NULL,
+	name VARCHAR(128),
+	country_id INT NOT NULL,
+	year_began INT,
+	year_ended INT,
+	notes TEXT,
+	url VARCHAR(256),
+	PRIMARY KEY (id),
+	FOREIGN KEY (country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE Brand_Group (
+	id INT NOT NULL,
+	name VARCHAR(128),
+	year_began INT,
+	year_ended INT,
+	notes TEXT,
+	url VARCHAR(256),
+	publisher_id INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (publisher_id) REFERENCES Publisher(id)
+);
+
+CREATE TABLE Indicia_Publisher (
+	id INT NOT NULL,
+	name VARCHAR(128),
+	publisher_id INT NOT NULL,
+	country_id INT NOT NULL,
+	year_began INT,
+	year_ended INT,
+	is_surrogate INT,
+	notes TEXT,
+	url VARCHAR(256),
+	PRIMARY KEY (id),
+	FOREIGN KEY (publisher_id) REFERENCES Publisher(id),
+	FOREIGN KEY (country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE Issue (
+	id INT NOT NULL,
+	number VARCHAR(64),
+	series_id INT,
+	indicia_publisher_id INT,
+	publication_date INT,
+	price VARCHAR(16),
+	page_count INT,
+	indicia_frequency VARCHAR(160),
+	notes TEXT,
+	isbn VARCHAR(64),
+	valid_isbn VARCHAR(64),
+	barcode VARCHAR(64),
+	title VARCHAR(128),
+	on_sale_date INT,
+	rating VARCHAR(128),
+	PRIMARY KEY (id),
+/* 	FOREIGN KEY (series_id) REFERENCES Series(id), *\/
+	FOREIGN KEY (indicia_publisher_id) REFERENCES Indicia_Publisher(id)
+);
+
+
+CREATE TABLE Issue_Editing (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Issue_Has_Editing (
+	 issue_id INT NOT NULL,
+	 editing_id INT NOT NULL,
+	 PRIMARY KEY (issue_id, editing_id),
+	 FOREIGN KEY (issue_id) REFERENCES Issue(id),
+	 FOREIGN KEY (editing_id) REFERENCES Issue_Editing(id)
+);
+
+CREATE TABLE Story (
+	id INT NOT NULL,
+	title VARCHAR(512),
+	issue_id INT,
+	letters TEXT,
+	editing VARCHAR(512),
+	synopsis TEXT,
+	reprint_notes TEXT,
+	notes TEXT,
+	type_id INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (issue_id) REFERENCES Issue(id),
+	FOREIGN KEY (type_id) REFERENCES Story_Type(id)
+);
+
+CREATE TABLE Series (
+	id INT NOT NULL,
+	name VARCHAR(256),
+	format VARCHAR(256),
+	year_began INT,
+	year_ended INT,
+	publication_dates INT,
+	first_issue_id INT,
+	last_issue_id INT,
+	publisher_id INT NOT NULL,
+	country_id INT NOT NULL,
+	language_id INT NOT NULL,
+	notes TEXT,
+	dimensions VARCHAR(256),
+	publishing_format VARCHAR(128),
+	publication_type_id INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (first_issue_id) REFERENCES Issue(id),
+	FOREIGN KEY (last_issue_id) REFERENCES Issue(id),
+	FOREIGN KEY (publisher_id) REFERENCES Publisher(id),
+	FOREIGN KEY (language_id) REFERENCES Language(id),
+	FOREIGN KEY (country_id) REFERENCES Country(id),
+	FOREIGN KEY (publication_type_id) REFERENCES Series_Publication_Type(id)
+);
+
+ALTER TABLE Issue ADD CONSTRAINT series_id FOREIGN KEY (series_id) REFERENCES Series(id);
+
 CREATE TABLE Serie_Binding (
 	id INT NOT NULL,
 	name VARCHAR(32),
@@ -336,133 +634,130 @@ CREATE TABLE Issue_Reprint (
 	PRIMARY KEY (origin_id, target_id),
 	FOREIGN KEY (origin_id) REFERENCES Story(id),
 	FOREIGN KEY (target_id) REFERENCES Story(id)
-);</string>
-			<key>table</key>
-			<string>Story_Reprint</string>
-			<key>view</key>
-			<string>SP_VIEW_CUSTOMQUERY</string>
-			<key>windowVerticalDividerPosition</key>
-			<real>200</real>
-		</dict>
-	</dict>
-	<key>encrypted</key>
-	<false/>
-	<key>format</key>
-	<string>connection</string>
-	<key>queryFavorites</key>
-	<array/>
-	<key>queryHistory</key>
-	<array>
-		<string>CREATE TABLE Story_Reprint (
-	origin_id INT NOT NULL,
-	target_id INT NOT NULL,
-	PRIMARY KEY (origin_id, target_id),
-	FOREIGN KEY (origin_id) REFERENCES Story(id),
-	FOREIGN KEY (target_id) REFERENCES Story(id)
+);
+ */
+
+
+-- Print the brand group names with the highest number of Belgian indicia publishers.
+SELECT G.name
+FROM Brand_Group G
+WHERE G.publisher_id IN 
+			(SELECT I2.publisher_id
+			 FROM Indicia_Publisher I2, Country C1
+			 WHERE C1.name = "Belgium" AND I2.country_id = C1.id
+			 GROUP BY I2.publisher_id
+			 HAVING COUNT(*) &gt;= 
+			 	(SELECT MAX(counted) FROM (SELECT COUNT(I3.id) AS counted
+										   FROM Indicia_Publisher I3, Country C2
+										   WHERE C2.name = "Belgium" AND I3.country_id = C2.id
+										   GROUP BY I3.publisher_id) AS counts))</string>
+		<string>-- Print the ids and names of publishers of Danish book series.								   
+SELECT DISTINCT(P.id), P.name
+FROM Publisher P
+WHERE P.id IN (SELECT S.publisher_id
+			   FROM Series S, Language L
+			   WHERE L.name = "Danish" AND S.language_id = L.id)</string>
+		<string>-- Print the ids and names of publishers of Danish book series.
+-- But slower.		   
+SELECT DISTINCT(P.id), P.name
+FROM Publisher P JOIN Series S, Language L
+WHERE P.id = S.publisher_id AND L.name = "Danish" AND S.language_id = L.id</string>
+		<string>-- Print the names of all Swiss series that have been published in magazines.
+SELECT S.name
+FROM Series S, Country C, Series_Publication_Type T
+WHERE C.name = "Switzerland" AND C.id = S.country_id AND T.name = "magazine" AND S.publication_type_id = T.id</string>
+		<string>-- Starting from 1990, print the number of issues published each year.
+SELECT I.publication_date, COUNT(I.id)
+FROM Issue I
+WHERE I.publication_date &gt;= 1990
+GROUP BY I.publication_date</string>
+		<string>-- Print the number of series for each indicia publisher whose name resembles ‘DC comics’.
+SELECT I.indicia_publisher_id, IndiPubli.name, COUNT(DISTINCT(I.series_id))
+FROM Issue I, Indicia_Publisher IndiPubli
+WHERE I.indicia_publisher_id = IndiPubli.id AND IndiPubli.name LIKE 'DC comics'
+GROUP BY I.indicia_publisher_id</string>
+		<string>SELECT S.title, count FROM 
+(SELECT SR.origin_id, COUNT(*) AS count 
+ FROM Story_Reprint SR 
+ GROUP BY SR.origin_id 
+ ORDER BY COUNT(*) DESC) S1
+JOIN Story S
+ON S.id = S1.origin_id
+WHERE S.title IS NOT NULL
+LIMIT 10</string>
+		<string>SELECT S.title, count FROM 
+(SELECT SR.origin_id, COUNT(*) AS count 
+ FROM Story_Reprint SR 
+ GROUP BY SR.origin_id 
+ ORDER BY COUNT(*) DESC 
+ LIMIT 10) S1
+JOIN Story S
+ON S.id = S1.origin_id</string>
+		<string>-- Print the titles of the 10 most reprinted stories
+SELECT S.title, COUNT(*)
+FROM Story_Reprint SR, Story S
+WHERE S.title IS NOT NULL AND S.id = SR.origin_id
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>SELECT S.title, COUNT(*)
+FROM Story_Reprint SR, Story S
+WHERE S.id = SR.origin_id AND S.title IS NOT NULL
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>SELECT S.title, COUNT(*)
+FROM Story_Reprint SR, Story S
+WHERE S.id = SR.origin_id
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>SELECT S.name, COUNT(*)
+FROM Story_Reprint SR, Story S
+WHERE S.id = SR.origin_id
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>SELECT SR.origin_id, COUNT(*)
+FROM Story_Reprint SR
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>SELECT TOP 10 counted FROM (			   
+	SELECT SR.origin_id, COUNT(*) AS counted
+	FROM Story_Reprint SR
+	GROUP BY SR.origin_id 
+	ORDER BY COUNT(*) DESC
 )</string>
-		<string>CREATE TABLE Issue_Reprint (
-	origin_id INT NOT NULL,
-	target_id INT NOT NULL,
-	PRIMARY KEY (origin_id, target_id),
-	FOREIGN KEY (origin_id) REFERENCES Story(id),
-	FOREIGN KEY (target_id) REFERENCES Story(id)
+		<string>SELECT TOP 10 * FROM (			   
+	SELECT SR.origin_id, COUNT(*)
+	FROM Story_Reprint SR
+	GROUP BY SR.origin_id 
+	ORDER BY COUNT(*) DESC
 )</string>
-		<string>CREATE TABLE Story_Characters (
-	id INT NOT NULL,
-	name VARCHAR(2048),
-	PRIMARY KEY(id)
+		<string>SELECT TOP 10 FROM (			   
+	SELECT SR.origin_id, COUNT(*)
+	FROM Story_Reprint SR
+	GROUP BY SR.origin_id 
+	ORDER BY COUNT(*) DESC
 )</string>
-		<string>CREATE TABLE Story_Has_Genres (
-	story_id INT NOT NULL,
-	genre_id INT NOT NULL,
-	PRIMARY KEY(story_id, genre_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(genre_id) REFERENCES Story_Genres(id)
-)</string>
-		<string>CREATE TABLE Story_Genres (
-	id INT NOT NULL,
-	name VARCHAR(32),
-	PRIMARY KEY(id)
-)</string>
-		<string>CREATE TABLE Story_Has_Scripts (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_Has_Pencils (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_Has_Colors (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_Has_Inks (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_Has_Artists (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_has_Artists (
-	story_id INT NOT NULL,
-	artist_id INT NOT NULL,
-	PRIMARY KEY (story_id, artist_id),
-	FOREIGN KEY(story_id) REFERENCES Story(id),
-	FOREIGN KEY(artist_id) REFERENCES Story_Artists(id)
-)</string>
-		<string>CREATE TABLE Story_Artists (
-	id INT NOT NULL,
-	name VARCHAR(64),
-	PRIMARY KEY(id)
-)</string>
-		<string>CREATE TABLE Story_Features (
-	id INT NOT NULL,
-	name VARCHAR(64),
-	PRIMARY KEY (id)
-)</string>
-		<string>select * from Serie_colors</string>
-		<string>select * from Serie_Has_Colors</string>
-		<string>select * from Series_Has_Colors</string>
-		<string>CREATE TABLE Serie_Has_Colors (
-	series_id INT NOT NULL,
-	color_id INT NOT NULL,
-	PRIMARY KEY (series_id, color_id),
-	FOREIGN KEY (series_id) REFERENCES Series(id),
-	FOREIGN KEY (color_id) REFERENCES Serie_Colors(id)
-)</string>
-		<string>CREATE TABLE Serie_Colors (
-	id INT NOT NULL,
-	name VARCHAR(64),
-	PRIMARY KEY (id)
-)</string>
-		<string>CREATE TABLE Serie_Colors (
-	id INT NOT NULL,
-	name VARCHAR(32),
-	PRIMARY KEY (id)
-)</string>
-		<string>CREATE TABLE Serie_Has_Binding (
-	series_id INT NOT NULL,
-	binding_id INT NOT NULL,
-	PRIMARY KEY (series_id, binding_id),
-	FOREIGN KEY (series_id) REFERENCES Series(id),
-	FOREIGN KEY (binding_id) REFERENCES Serie_Binding(id)
-)</string>
+		<string>SELECT SR.origin_id, COUNT(*)
+	FROM Story_Reprint SR
+	GROUP BY SR.origin_id 
+	ORDER BY COUNT(*) DESC</string>
+		<string>SELECT TOP 10 * FROM (			   
+SELECT SR.origin_id, COUNT(*)
+FROM Story_Reprint SR
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC)</string>
+		<string>SELECT TOP 10 SR.origin_id, COUNT(*)
+FROM Story_Reprint SR
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC</string>
+		<string>SELECT SR.origin_id, COUNT(*)
+FROM Story_Reprint SR
+GROUP BY SR.origin_id 
+ORDER BY COUNT(*) DESC</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
