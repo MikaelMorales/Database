@@ -80,3 +80,15 @@ WHERE S.id NOT IN
 (R.origin_id = X.story_id OR R.target_id = X.story_id));
 
 -- 823303 line
+
+
+-- VERSION 2
+SELECT DISTINCT S.title
+FROM Story_Has_Features SHF, Story_Features SF, Story_Characters SC, Story_Has_Characters SHC, Story S
+WHERE SF.name != "Batman" AND 
+	  SHF.feature_id = SF.id AND 
+	  SC.name = "Batman" AND 
+	  SHC.`character_id` = SC.`id` AND 
+	  SHF.`story_id` = SHC.`story_id` AND 
+	  S.id = SHF.story_id AND 
+	  S.title IS NOT NULL AND S.id NOT IN (SELECT SR.`origin_id` FROM Story_Reprint SR);
