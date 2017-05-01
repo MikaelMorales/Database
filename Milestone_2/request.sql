@@ -16,8 +16,8 @@ WHERE G.publisher_id IN
 SELECT DISTINCT(P.id), P.name
 FROM Publisher P
 WHERE P.id IN (SELECT S.publisher_id
-			   FROM Series S, Language L
-			   WHERE L.name = "Danish" AND S.language_id = L.id);
+			   FROM Series S, Country C
+			   WHERE C.name = "Denmark" AND S.country_id = C.id);
 
 -- Print the ids and names of publishers of Danish book series.
 -- But slower.		   
@@ -64,25 +64,16 @@ LIMIT 10;
 
 
 -- Print the artists that have scripted, drawn, and colored at least one of the stories they were involved in.
-
-SELECT name FROM Story_Artists A, (SELECT DISTINCT C.artist_id FROM Story_Has_Scripts H, Story_Has_Colors C, `Story_Has_Pencils` P    WHERE  
-H.`story_id` = C.`story_id` AND C.`story_id` = P.`story_id`  AND
-H.`artist_id` = C.`artist_id` AND C.`artist_id` = P.`artist_id`) X WHERE A.id = X.`artist_id`;
-
--- 4150 line.
+SELECT name 
+FROM Story_Artists A
+WHERE A.id IN (SELECT DISTINCT C.artist_id 
+			   FROM Story_Has_Scripts H, Story_Has_Colors C, `Story_Has_Pencils` P    
+			   WHERE H.`story_id` = C.`story_id` AND 
+		  		     C.`story_id` = P.`story_id`  AND 
+		  			 H.`artist_id` = C.`artist_id` AND  
+		 			 C.`artist_id` = P.`artist_id`);
 
 -- Print all non-reprinted stories involving Batman as a non-featured character.
-
--- VERSION 1
-SELECT DISTINCT  S.title FROM Story S
-WHERE S.id NOT IN
-(SELECT DISTINCT X.story_id FROM `Story_Reprint` R, (SELECT DISTINCT story_id FROM Story_Has_Characters H, `Story_Characters` C WHERE C.`name` = 'Batman') X WHERE  
-(R.origin_id = X.story_id OR R.target_id = X.story_id));
-
--- 823303 line
-
-
--- VERSION 2
 SELECT DISTINCT S.title
 FROM Story_Has_Features SHF, Story_Features SF, Story_Characters SC, Story_Has_Characters SHC, Story S
 WHERE SF.name != "Batman" AND 
