@@ -75,11 +75,12 @@ WHERE A.id IN (SELECT DISTINCT C.artist_id
 
 -- Print all non-reprinted stories involving Batman as a non-featured character.
 SELECT DISTINCT S.title
-FROM Story_Has_Features SHF, Story_Features SF, Story_Characters SC, Story_Has_Characters SHC, Story S
-WHERE SF.name != "Batman" AND 
-	  SHF.feature_id = SF.id AND 
-	  SC.name = "Batman" AND 
-	  SHC.`character_id` = SC.`id` AND 
-	  SHF.`story_id` = SHC.`story_id` AND 
-	  S.id = SHF.story_id AND 
-	  S.title IS NOT NULL AND S.id NOT IN (SELECT SR.`origin_id` FROM Story_Reprint SR);
+FROM Story_Characters SC, Story_Has_Characters SHC, Story S
+WHERE SC.name = "Batman" AND 
+	  SHC.character_id = SC.id AND 
+	  S.id = SHC.story_id AND 
+	  S.title IS NOT NULL AND 
+	  S.id NOT IN (SELECT SR.origin_id FROM Story_Reprint SR) AND
+	  S.id NOT IN (SELECT DISTINCT SHF.story_id 
+				   FROM Story_Has_Features SHF, Story_Features SF
+				   WHERE SF.name = "Batman" AND SHF.feature_id = SF.id);
