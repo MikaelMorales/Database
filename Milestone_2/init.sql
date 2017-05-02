@@ -141,7 +141,6 @@ CREATE TABLE Series (
 
 ALTER TABLE Issue ADD CONSTRAINT series_id FOREIGN KEY (series_id) REFERENCES Series(id);
 
-
 CREATE TABLE Serie_Binding (
 	id INT NOT NULL,
 	name VARCHAR(32),
@@ -168,6 +167,20 @@ CREATE TABLE Serie_Has_Colors (
 	PRIMARY KEY (series_id, color_id),
 	FOREIGN KEY (series_id) REFERENCES Series(id),
 	FOREIGN KEY (color_id) REFERENCES Serie_Colors(id)
+);
+
+CREATE TABLE Series_Paper_Stock (
+	id INT NOT NULL,
+	name VARCHAR(32),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Series_Has_Paper_Stock (
+	series_id INT NOT NULL,
+	paper_stock_id INT NOT NULL,
+	PRIMARY KEY (series_id, paper_stock_id),
+	FOREIGN KEY (series_id) REFERENCES Series(id),
+	FOREIGN KEY (paper_stock_id) REFERENCES Series_Paper_Stock(id)
 );
 
 CREATE TABLE Story_Features (
