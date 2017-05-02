@@ -369,6 +369,15 @@ CREATE TABLE Issue_Reprint (
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>UPDATE Issue I
+SET I.`on_sale_date` = NULL
+WHERE I.`on_sale_date` &gt; 2017</string>
+		<string>UPDATE Issue I
+SET I.`publication_date` = NULL
+WHERE I.`publication_date` &gt; 2017</string>
+		<string>UPDATE Issue I
+ON I.`publication_date` = NULL
+WHERE I.`publication_date` &gt; 2017</string>
 		<string>/* CREATE TABLE Story_Type (
 	id INT NOT NULL,
 	name VARCHAR(40),
@@ -745,19 +754,6 @@ LIMIT 10</string>
 	FROM Story_Reprint SR
 	GROUP BY SR.origin_id 
 	ORDER BY COUNT(*) DESC</string>
-		<string>SELECT TOP 10 * FROM (			   
-SELECT SR.origin_id, COUNT(*)
-FROM Story_Reprint SR
-GROUP BY SR.origin_id 
-ORDER BY COUNT(*) DESC)</string>
-		<string>SELECT TOP 10 SR.origin_id, COUNT(*)
-FROM Story_Reprint SR
-GROUP BY SR.origin_id 
-ORDER BY COUNT(*) DESC</string>
-		<string>SELECT SR.origin_id, COUNT(*)
-FROM Story_Reprint SR
-GROUP BY SR.origin_id 
-ORDER BY COUNT(*) DESC</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>

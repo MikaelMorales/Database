@@ -67,7 +67,7 @@ LIMIT 10;
 SELECT name 
 FROM Story_Artists A
 WHERE A.id IN (SELECT DISTINCT C.artist_id 
-			   FROM Story_Has_Scripts H, Story_Has_Colors C, `Story_Has_Pencils` P    
+			   FROM Story_Has_Scripts H, Story_Has_Colors C, Story_Has_Pencils P    
 			   WHERE H.`story_id` = C.`story_id` AND 
 		  		     C.`story_id` = P.`story_id`  AND 
 		  			 H.`artist_id` = C.`artist_id` AND  
