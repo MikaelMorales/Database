@@ -4,20 +4,12 @@ This is only the source files. To have the interface running, you need to follow
 
 First at all, you need to have **npm** installed.
 Then, somewhere on your laptop, execute the following commands:
-1. ```bash
-npm install -g create-react-app
-```
-2. ```bash
-create-react-app my-app
-```
+1. `npm install -g create-react-app`
+2. `create-react-app my-app`
 
-3. ```bash
-cd my-app
-```
+3. `cd my-app`
 
-4 ```bash
-npm start
-```
+4 `npm start`
 
 It will open in your browser your web app.
 
