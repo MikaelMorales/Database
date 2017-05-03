@@ -9,7 +9,7 @@ Then, somewhere on your laptop, execute the following commands:
 
 3. `cd my-app`
 
-4 `npm start`
+4. `npm start`
 
 It will open in your browser your web app.
 
