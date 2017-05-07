@@ -4,26 +4,22 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import SearchTabContent from "./SearchTabContent";
 import QueryResultTabContent from "./QueryResultTabContent";
 
-
 class MyTabs extends Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {resultToDisplay: []}
+		this.state = {resultToDisplay: {}}
 		injectTapEventPlugin();
 	}
 
-	getResponse = (response) => {
-		this.setState({resultToDisplay: response});
-
-	}
+	pushResults = (data) => this.setState({resultToDisplay: data});
 
 	render() {
 		return (
 			<Tabs inkBarStyle={{background: '#EFEFEF'}} >
 				<Tab label="Search">
 					<SearchTabContent 
-						getResponse={this.getResponse}
+						pushResults={this.pushResults}
 					/>
 			    </Tab>
 

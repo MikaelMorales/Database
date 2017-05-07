@@ -6,14 +6,9 @@ import axios from "axios";
 
 class SearchTabContent extends React.Component {
 
-	submitStateEnum = {
-        "ABLE": 0,
-        "DISABLE": 1
-    };
-
 	constructor(props) {
 		super(props);
-		this.state = {value: "", submitState: this.submitStateEnum.DISABLE, advancedOpt: false, selectedTables: new Set()}
+		this.state = {value: "", advancedOpt: false, selectedTables: new Set(), disabled: false}
 	}
 
 	handleChange = (event) => {
@@ -24,17 +19,22 @@ class SearchTabContent extends React.Component {
         this.setState({value: event.target.value, submitState: submitState});
     }
 
-	handleSubmit = (event) => {
+    handleSubmit = (event) => {
 		event.preventDefault();
+		this.setState({disabled: true});
 		axios.post('http://localhost/search_request.php', {
 		    Request: this.state.value,
 	    	Tables: Array.from(this.state.selectedTables).toString()
 	    })
 	    .then((res) => {
-			console.log("keys : " + Object.keys(res.data));
-			console.log("data : " + res.data);
-			console.log("Story : " + res.data["Story"]);
-			this.props.getResponse(res.data);
+			this.props.pushResults(res.data);
+			console.log(JSON.stringify(res.data));
+			console.log(res.data["Story"]);
+			this.setState({disabled: false});
+		})
+		.catch((res) => {
+			console.log(res);
+			this.setState({disabled: false});
 		});
 	}
 
@@ -84,9 +84,9 @@ class SearchTabContent extends React.Component {
 	                hint={"Type here to search..."}
 	                value={this.state.value}
 	                handleChange={this.handleChange}
-	                handleSubmit={this.handleSubmit}
+	                handleSubmit={(e) => this.handleSubmit(e)}
 	                buttonLabel={"Search"}
-	                buttonDisabled={this.state.submitState !== this.submitStateEnum.ABLE}/>
+	                buttonDisabled={this.state.disabled}/>
 
 	            <RaisedButton
 	            	label={"Advanced Options"}

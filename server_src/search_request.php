@@ -3,9 +3,11 @@
    	$data = json_decode($request_body, true);
 	$tables = explode(",",$data['Tables']);
 
+	$tableToAttributes = array("Story" => ["title", "letters", "editing", "synopsis", "reprint_notes", "notes"], "Story_Artists" => ["name"], "Story_Characters" => ["name"]);
+
 	$connection_mysql = connectToDb();
 
-	makeSQLQuery($tables, $data['Request'], $connection_mysql);
+	makeSQLQuery($tables, $data['Request'], $connection_mysql, $tableToAttributes);
 
 	mysqli_close($connection_mysql);
 
@@ -40,9 +42,11 @@
 		return $connection_mysql;
 	}
 
-	function makeSQLQuery($tables, $requestedAttributes, $connection_mysql) {
+	function makeSQLQuery($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
 		if (is_numeric($requestedAttributes)) {
 			queryID($tables, $requestedAttributes, $connection_mysql);
+		} else {
+			queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes);
 		}
 	}
 
@@ -60,5 +64,36 @@
 			}
 		}
 		echo json_encode($tableToRow);		
+	}
+
+	function queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
+		$tableToRow = [];
+		$myfile = fopen("newfile.txt", "a") or die("Unable to open file!");
+		foreach ($tables as $table) {
+			$attributes = $tableToAttributes[$table];
+			$request = "SELECT * FROM " . $table . " WHERE " . $attributes[0] . " LIKE \"" . $requestedAttributes . "\"";
+			unset($attributes[0]);
+			foreach ($attributes as $attribute) {
+				$request .= " OR " . $attribute . " LIKE \"" . $requestedAttributes ."\"";
+			}
+			$request .= ";";
+			fwrite($myfile, $request);
+		    if ($result = $connection_mysql->query($request)) {
+		    	$row = $result->fetch_array(MYSQLI_ASSOC);
+		    	if ($row != null) {
+		    		$tableToRow[$table] = [];
+		    	}
+		    	while ($row != null) {
+		    		array_push($tableToRow[$table], $row);
+		    		$row = $result->fetch_array(MYSQLI_ASSOC);
+		    	}
+			} else {
+				printf("Error: %s\n", $connection_mysql->error);
+			}
+		}
+		$rowfile = fopen("rowfile.txt", "w") or die("Unable to open rowfile ! ");
+		fwrite($rowfile, json_encode($tableToRow));
+		fclose($rowfile);
+		echo json_encode($tableToRow);
 	}
 ?>

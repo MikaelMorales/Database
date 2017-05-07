@@ -7,15 +7,14 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardHeader} from 'material-ui/Card';
 
 class DisplayTable extends React.Component {
-	constructor(props) {
-		super(props);
-	}
 
 	render() {
-		if (!this.props.items.length) {
+		console.log("items");
+		console.log(this.props.items);
+		if (!Object.keys(this.props.items).length) {
 			return (<div/>);
 		} else {
 			const style = {
@@ -60,10 +59,10 @@ class DisplayTable extends React.Component {
 						     	 </TableRow>
 						    </TableHeader>
 						    <TableBody displayRowCheckbox={false} showRowHover={true}>
-						    	{this.props.items.map((item) => 
+						    	{this.props.items.map((item) =>
 						    		<TableRow key={item["id"]} >
 						    			{this.props.columnNames.map((name) =>
-						    				<TableRowColumn key={name}>{item[name]}</TableRowColumn>
+						    				<TableRowColumn key={name} tooltip={item[name]}>{item[name]}</TableRowColumn>
 						    			)}
 						    		</TableRow>
 						    	)}
