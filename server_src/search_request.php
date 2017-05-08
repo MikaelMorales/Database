@@ -1,6 +1,6 @@
 <?php
 	$request_body = file_get_contents('php://input');
-   	$data = json_decode($request_body, true);
+  $data = json_decode($request_body, true);
 	$tables = explode(",",$data['Tables']);
 
 	$tableToAttributes = array("Story" => ["title", "letters", "editing", "synopsis", "reprint_notes", "notes"], "Story_Artists" => ["name"], "Story_Characters" => ["name"]);
@@ -26,10 +26,10 @@
 		}
 
 		$success = mysqli_real_connect(
-		    $connection_mysql, 
+		    $connection_mysql,
 		    $host,
-		    $user, 
-		    $password, 
+		    $user,
+		    $password,
 		    $db,
 		    $port,
 		    $socket
@@ -43,10 +43,12 @@
 	}
 
 	function makeSQLQuery($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
-		if (is_numeric($requestedAttributes)) {
-			queryID($tables, $requestedAttributes, $connection_mysql);
-		} else {
-			queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes);
+		if ($requestedAttributes != null) {
+			if (is_numeric($requestedAttributes)) {
+				queryID($tables, $requestedAttributes, $connection_mysql);
+			} else {
+				queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes);
+			}
 		}
 	}
 
@@ -63,7 +65,7 @@
 				printf("Error: %s\n", $connection_mysql->error);
 			}
 		}
-		echo json_encode($tableToRow);		
+		echo json_encode($tableToRow);
 	}
 
 	function queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
@@ -77,7 +79,7 @@
 				$request .= " OR " . $attribute . " LIKE \"" . $requestedAttributes ."\"";
 			}
 			$request .= ";";
-			fwrite($myfile, $request);
+			fwrite($myfile, $request . "\n\n");
 		    if ($result = $connection_mysql->query($request)) {
 		    	$row = $result->fetch_array(MYSQLI_ASSOC);
 		    	if ($row != null) {
@@ -95,5 +97,11 @@
 		fwrite($rowfile, json_encode($tableToRow));
 		fclose($rowfile);
 		echo json_encode($tableToRow);
+	}
+
+	function test() {
+		$testfile = fopen("test.txt", "a") or die("Unable to open file!");
+		fwrite($testfile, "GROS TEST");
+		fclose($testfile);
 	}
 ?>
