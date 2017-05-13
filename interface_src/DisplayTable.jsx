@@ -46,14 +46,13 @@ class DisplayTable extends React.Component {
 					      title={this.props.tableName}
 					      style={style.cardHeaderStyle}
 					    />
-						<Table 
+						<Table
 							style={style.tableStyle}
-							maxHeight={300} // height={300}
 							fixedHeader={true}
 						>
 						    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
 						      	<TableRow>
-						      		{this.props.columnNames.map((name) => 
+						      		{this.props.columnNames.map((name) =>
 						      			<TableHeaderColumn key={name} style={style.headerStyle}>{name}</TableHeaderColumn>
 						      		)}
 						     	 </TableRow>
@@ -62,7 +61,7 @@ class DisplayTable extends React.Component {
 						    	{this.props.items.map((item) =>
 						    		<TableRow key={item["id"]} >
 						    			{this.props.columnNames.map((name) =>
-						    				<TableRowColumn key={name} tooltip={item[name]}>{item[name]}</TableRowColumn>
+						    				<TableRowColumn key={name}>{item[name]}</TableRowColumn>
 						    			)}
 						    		</TableRow>
 						    	)}
@@ -70,7 +69,7 @@ class DisplayTable extends React.Component {
 						</Table>
 					</Card>
 				</div>
-			);	
+			);
 		}
 	}
 }
