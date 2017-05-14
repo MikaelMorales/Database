@@ -1,46 +1,16 @@
 <?php
+	include("Utils.php");
 	$request_body = file_get_contents('php://input');
   $data = json_decode($request_body, true);
 	$tables = explode(",",$data['Tables']);
 
 	$tableToAttributes = array("Story" => ["title", "letters", "editing", "synopsis", "reprint_notes", "notes"], "Story_Artists" => ["name"], "Story_Characters" => ["name"]);
 
-	$connection_mysql = connectToDb();
+	$connection_mysql = Utils::connect_to_db();
 
 	makeSQLQuery($tables, $data['Request'], $connection_mysql, $tableToAttributes);
 
 	mysqli_close($connection_mysql);
-
-	function connectToDb() {
-		$user = 'charles';
-		$password = 'some_pass';
-		$db = 'comics';
-		$host = '127.0.0.1';
-		$port = 3306;
-		$socket = 'localhost:/tmp/mysql.sock';
-
-		$connection_mysql = mysqli_init();
-
-		if (!$connection_mysql) {
-		    die('mysqli_init failed');
-		}
-
-		$success = mysqli_real_connect(
-		    $connection_mysql,
-		    $host,
-		    $user,
-		    $password,
-		    $db,
-		    $port,
-		    $socket
-		);
-
-		if (!$success) {
-			die("Connection failed");
-		}
-
-		return $connection_mysql;
-	}
 
 	function makeSQLQuery($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
 		if ($requestedAttributes != null) {
@@ -53,24 +23,17 @@
 	}
 
 	function queryID($tables, $requestedAttributes, $connection_mysql) {
-		$tableToRow = [];
+		$tableToRows = [];
 		foreach ($tables as $table) {
-		    if ($result = $connection_mysql->query("SELECT * FROM " . $table . " WHERE id = " . $requestedAttributes . ";")) {
-		    	$tableToRow[$table] = [];
-		    	$result_array = $result->fetch_array(MYSQLI_ASSOC);
-		    	if ($result_array != null) {
-		    		array_push($tableToRow[$table], $result_array);
-		    	}
-			} else {
-				printf("Error: %s\n", $connection_mysql->error);
-			}
+				$request = "SELECT * FROM " . $table . " WHERE id = " . $requestedAttributes . ";";
+
+				$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows);
 		}
-		echo json_encode($tableToRow);
+		echo json_encode($tableToRows);
 	}
 
 	function queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
-		$tableToRow = [];
-		$myfile = fopen("newfile.txt", "a") or die("Unable to open file!");
+		$tableToRows = [];
 		foreach ($tables as $table) {
 			$attributes = $tableToAttributes[$table];
 			$request = "SELECT * FROM " . $table . " WHERE " . $attributes[0] . " LIKE \"" . $requestedAttributes . "\"";
@@ -79,29 +42,9 @@
 				$request .= " OR " . $attribute . " LIKE \"" . $requestedAttributes ."\"";
 			}
 			$request .= ";";
-			fwrite($myfile, $request . "\n\n");
-		    if ($result = $connection_mysql->query($request)) {
-		    	$row = $result->fetch_array(MYSQLI_ASSOC);
-		    	if ($row != null) {
-		    		$tableToRow[$table] = [];
-		    	}
-		    	while ($row != null) {
-		    		array_push($tableToRow[$table], $row);
-		    		$row = $result->fetch_array(MYSQLI_ASSOC);
-		    	}
-			} else {
-				printf("Error: %s\n", $connection_mysql->error);
-			}
-		}
-		$rowfile = fopen("rowfile.txt", "w") or die("Unable to open rowfile ! ");
-		fwrite($rowfile, json_encode($tableToRow));
-		fclose($rowfile);
-		echo json_encode($tableToRow);
-	}
 
-	function test() {
-		$testfile = fopen("test.txt", "a") or die("Unable to open file!");
-		fwrite($testfile, "GROS TEST");
-		fclose($testfile);
+			$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows);
+		}
+		echo json_encode($tableToRows);
 	}
 ?>
