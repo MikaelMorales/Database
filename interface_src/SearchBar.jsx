@@ -7,13 +7,12 @@ import RaisedButton from "material-ui/RaisedButton";
 
 export default ({hint, value, handleChange, handleSubmit, buttonLabel, buttonDisabled}) => {
 
-    
+
     const style = {
         formStyle: {
             display: "flex",
             justifyContent: "space-around",
             alignItems: "center",
-            marginTop: "100px",
             minWidth: "1000px"
         },
         textFieldStyle: {
@@ -21,7 +20,7 @@ export default ({hint, value, handleChange, handleSubmit, buttonLabel, buttonDis
             width: "95%"
         },
         paperStyle: {
-            width: "80%"
+            width: "70%"
         }
     }
 

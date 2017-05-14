@@ -12,6 +12,7 @@ import {Card, CardHeader} from 'material-ui/Card';
 class DisplayTable extends React.Component {
 
 	render() {
+    let rowId = 0;
 		console.log("items");
 		console.log(this.props.items);
 		if (!Object.keys(this.props.items).length) {
@@ -59,7 +60,7 @@ class DisplayTable extends React.Component {
 						    </TableHeader>
 						    <TableBody displayRowCheckbox={false} showRowHover={true}>
 						    	{this.props.items.map((item) =>
-						    		<TableRow key={item["id"]} >
+						    		<TableRow key={++rowId} >
 						    			{this.props.columnNames.map((name) =>
 						    				<TableRowColumn key={name}>{item[name]}</TableRowColumn>
 						    			)}

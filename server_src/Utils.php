@@ -31,7 +31,7 @@ final class Utils {
 		return $connection_mysql;
   }
 
-  static function execute_request($connection_mysql, $request, $tableToRows) {
+  static function execute_request($connection_mysql, $request, $tableToRows, $table) {
     if ($result = $connection_mysql->query($request)) {
       $row = $result->fetch_array(MYSQLI_ASSOC);
       if ($row != null) {
@@ -44,7 +44,8 @@ final class Utils {
 
       return $tableToRows;
     } else {
-      printf("Error: %s\n", $connection_mysql->error);
+        printf("Error: %s\n", $connection_mysql->error);
+        error_log($connection_mysql->error . "\n", 3, "error_log.txt");
     }
   }
 }

@@ -23,7 +23,7 @@ mysqli_close($connection_mysql);
 
 function executeQuery($connection_mysql, $query, $table) {
   $tableToRows = [];
-  $tableToRows = Utils::execute_request($connection_mysql, $query, $tableToRows);
+  $tableToRows = Utils::execute_request($connection_mysql, $query, $tableToRows, $table);
   echo json_encode($tableToRows);
 }
 ?>

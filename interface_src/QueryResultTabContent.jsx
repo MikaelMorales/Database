@@ -2,8 +2,16 @@ import * as React from "react";
 import DisplayTable from "./DisplayTable";
 
 class QueryResultTabContent extends React.Component {
-	
-	tableToName = {"Story": "Story", "Story_Artists": "Artists", "Story_Characters": "Characters"};
+
+	tableToName = {"Story_Artists": "Artists", "Story_Characters": "Characters", "Brand_Group": "Brand Group"};
+
+	getTableName(key) {
+		if (key in this.tableToName) {
+			return this.tableToName[key];
+		} else {
+			return key;
+		}
+	}
 
 	render() {
 		console.log("call to render method of query result tab content");
@@ -25,18 +33,18 @@ class QueryResultTabContent extends React.Component {
 				<div style={style.containerStyle}>
 					<div/>
 
-					{Object.keys(this.props.resultToDisplay).map((key) => 
+					{Object.keys(this.props.resultToDisplay).map((key) =>
 						<DisplayTable
 							key={key}
-							tableName={this.tableToName[key]}
+							tableName={this.getTableName(key)}
 							columnNames={Object.keys(this.props.resultToDisplay[key][0])}
 							items={this.props.resultToDisplay[key]}
 						/>
 					)}
 				</div>
-					
+
 			);
-		}	
+		}
 	}
 }
 

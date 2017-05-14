@@ -1,7 +1,8 @@
 <?php
 	include("Utils.php");
+	include("TablesInformations.php");
 	$request_body = file_get_contents('php://input');
-  $data = json_decode($request_body, true);
+    $data = json_decode($request_body, true);
 	$tables = explode(",",$data['Tables']);
 
 	$tableToAttributes = array("Story" => ["title", "letters", "editing", "synopsis", "reprint_notes", "notes"], "Story_Artists" => ["name"], "Story_Characters" => ["name"]);
@@ -26,8 +27,7 @@
 		$tableToRows = [];
 		foreach ($tables as $table) {
 				$request = "SELECT * FROM " . $table . " WHERE id = " . $requestedAttributes . ";";
-
-				$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows);
+				$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows, $table);
 		}
 		echo json_encode($tableToRows);
 	}
@@ -35,7 +35,7 @@
 	function queryOnStandardAttributes($tables, $requestedAttributes, $connection_mysql, $tableToAttributes) {
 		$tableToRows = [];
 		foreach ($tables as $table) {
-			$attributes = $tableToAttributes[$table];
+			$attributes = TablesInformations::getAttributesOfTable($table);
 			$request = "SELECT * FROM " . $table . " WHERE " . $attributes[0] . " LIKE \"" . $requestedAttributes . "\"";
 			unset($attributes[0]);
 			foreach ($attributes as $attribute) {
@@ -43,7 +43,7 @@
 			}
 			$request .= ";";
 
-			$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows);
+			$tableToRows = Utils::execute_request($connection_mysql, $request, $tableToRows, $table);
 		}
 		echo json_encode($tableToRows);
 	}

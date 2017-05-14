@@ -3,6 +3,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import SearchTabContent from "./SearchTabContent";
 import QueryResultTabContent from "./QueryResultTabContent";
+import PredifinedQueriesTabContent from "./PredifinedQueriesTabContent";
 
 class MyTabs extends Component {
 
@@ -18,17 +19,19 @@ class MyTabs extends Component {
 		return (
 			<Tabs inkBarStyle={{background: '#EFEFEF'}} >
 				<Tab label="Search">
-					<SearchTabContent 
+					<SearchTabContent
 						pushResults={this.pushResults}
 					/>
 			    </Tab>
-
-				<Tab label="Predifined Queries">
 					
-			    </Tab>
+				<Tab label="Predifined Queries">
+						<PredifinedQueriesTabContent
+								pushResults={this.pushResults}
+						/>
+			  </Tab>
 
 			    <Tab label="Query Results">
-			    	<QueryResultTabContent 
+			    	<QueryResultTabContent
 				    	resultToDisplay={this.state.resultToDisplay}
 			    	/>
 			    </Tab>
