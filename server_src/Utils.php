@@ -44,7 +44,7 @@ final class Utils {
 
       return $tableToRows;
     } else {
-        printf("Error: %s\n", $connection_mysql->error);
+        echo "Error: " . $connection_mysql->error;
         error_log($connection_mysql->error . "\n", 3, "error_log.txt");
     }
   }

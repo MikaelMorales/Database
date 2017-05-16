@@ -13,12 +13,22 @@ final class TablesInformations {
     "Brand_Group" => "Brand Group"
   );
 
+  private static $idToName = array(
+      1 => "Story",
+      2 =>  "Story_Artists",
+      3 => "Story_Characters"
+  );
+
   static function getAttributesOfTable($tableName) {
     return self::$tableToAttributes[$tableName];
   }
 
   static function getNicerNames($tableName) {
     return self::$tableNamesToNicerNames[$tableName];
+  }
+
+  static function getName($tableId) {
+      return self::$idToName[$tableId];
   }
 
 }
