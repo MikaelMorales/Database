@@ -1,14 +1,22 @@
 -- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
 
+--  start :draft to understand	
+	SELECT DISTINCT I.series_id FROM (
+				SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN
+		(
+			SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id );
+-- end : draft to understand
 
 SELECT SER.name FROM 
 (
-	SELECT DISTINCT I.series_id, MAX(numberOfSeries) FROM (
-		SELECT DISTINCT S1.issue_id FROM  Story S1 LEFT JOIN
+	SELECT DISTINCT I.series_id FROM (
+				SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN
 		(
-			SELECT T.id FROM Story_Type T, Story S, MAX(numberOfTypes) WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY numberOfTypes) A 
-		ON S1.type_id = A.id WHERE A.id IS NULL ) X 
-	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id AS numberOfSeries) Z
+			SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id DESC LIMIT 1 ) Z
 INNER JOIN Series SER ON Z.series_id = SER.id ;
 
 
@@ -172,6 +180,7 @@ WHERE I.id = 1268358 AND S.issue_id IS NOT NULL AND I.id = S.issue_id AND STR.or
 GROUP BY STR.origin_id
 ORDER BY COUNT(*) DESC
 LIMIT 1;
+
 
 
 
