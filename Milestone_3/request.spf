@@ -13,15 +13,15 @@
 			<key>database</key>
 			<string>comics</string>
 			<key>host</key>
-			<string>127.0.0.1</string>
+			<string>localhost</string>
 			<key>kcid</key>
-			<string>9181927296464025220</string>
+			<string>-1635523965695179128</string>
 			<key>name</key>
-			<string>Comics</string>
-			<key>port</key>
-			<integer>3306</integer>
+			<string>comics</string>
 			<key>rdbms_type</key>
 			<string>mysql</string>
+			<key>socket</key>
+			<string>/tmp/mysql.sock</string>
 			<key>sslCACertFileLocation</key>
 			<string></string>
 			<key>sslCACertFileLocationEnabled</key>
@@ -35,42 +35,36 @@
 			<key>sslKeyFileLocationEnabled</key>
 			<integer>0</integer>
 			<key>type</key>
-			<string>SPTCPIPConnection</string>
+			<string>SPSocketConnection</string>
 			<key>useSSL</key>
 			<integer>0</integer>
 			<key>user</key>
-			<string>Mikael</string>
+			<string>root</string>
 		</dict>
 		<key>session</key>
 		<dict>
 			<key>connectionEncoding</key>
 			<string>latin1</string>
-			<key>contentFilter</key>
-			<dict/>
 			<key>contentPageNumber</key>
 			<integer>1</integer>
 			<key>contentSelection</key>
 			<data>
-			YnBsaXN0MDDUAQIDBAUGNjdYJHZlcnNpb25YJG9iamVjdHNZJGFy
-			Y2hpdmVyVCR0b3ASAAGGoK0HCBUWFxgZHSQoLDA0VSRudWxs0wkK
-			CwwQFFdOUy5rZXlzWk5TLm9iamVjdHNWJGNsYXNzow0OD4ACgAOA
-			BKMREhOABYAGgAiADFR0eXBlVHJvd3NUa2V5c18QJlNlbGVjdGlv
-			bkRldGFpbFR5cGVQcmltYXJ5S2V5ZWREZXRhaWxz0wkKCxobHKCg
-			gAfSHh8gIVokY2xhc3NuYW1lWCRjbGFzc2VzXxATTlNNdXRhYmxl
-			RGljdGlvbmFyeaMgIiNcTlNEaWN0aW9uYXJ5WE5TT2JqZWN00goL
-			JSehJoAJgAvSCykqK1lOUy5zdHJpbmeAClJpZNIeHy0uXxAPTlNN
-			dXRhYmxlU3RyaW5noy0vI1hOU1N0cmluZ9IeHzEyXk5TTXV0YWJs
-			ZUFycmF5ozEzI1dOU0FycmF50h4fIjWiIiNfEA9OU0tleWVkQXJj
-			aGl2ZXLRODlUZGF0YYABAAgAEQAaACMALQAyADcARQBLAFIAWgBl
-			AGwAcAByAHQAdgB6AHwAfgCAAIIAhwCMAJEAugDBAMIAwwDFAMoA
-			1QDeAPQA+AEFAQ4BEwEVARcBGQEeASgBKgEtATIBRAFIAVEBVgFl
-			AWkBcQF2AXkBiwGOAZMAAAAAAAACAQAAAAAAAAA6AAAAAAAAAAAA
-			AAAAAAABlQ==
+			YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJX
+			TlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAF
+			gAdUdHlwZVRyb3dzXxAdU2VsZWN0aW9uRGV0YWlsVHlwZU5TSW5k
+			ZXhTZXTSFwsYGVxOU1JhbmdlQ291bnQQAIAG0hscHR5aJGNsYXNz
+			bmFtZVgkY2xhc3Nlc1pOU0luZGV4U2V0oh8gWk5TSW5kZXhTZXRY
+			TlNPYmplY3TSGxwiI1xOU0RpY3Rpb25hcnmiIiBfEA9OU0tleWVk
+			QXJjaGl2ZXLRJidUZGF0YYABAAgAEQAaACMALQAyADcAQABGAE0A
+			VQBgAGcAagBsAG4AcQBzAHUAdwB8AIEAoQCmALMAtQC3ALwAxwDQ
+			ANsA3gDpAPIA9wEEAQcBGQEcASEAAAAAAAACAQAAAAAAAAAoAAAA
+			AAAAAAAAAAAAAAABIw==
 			</data>
 			<key>contentSortColIsAsc</key>
 			<true/>
 			<key>contentViewport</key>
-			<string>{{0, 0}, {1080, 518}}</string>
+			<string>{{0, 0}, {694, 450}}</string>
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
@@ -151,6 +145,44 @@ GROUP BY S2.indicia_publisher_id
 ORDER BY MAX(S1.count) DESC
 LIMIT 10;
 
+
+
+SELECT S1.indicia_publisher_id, S1.name
+FROM
+	 (SELECT I.indicia_publisher_id, Indi.name, COUNT(*) as count 
+	  FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher Indi
+	  WHERE ST.id = STHS.story_id AND 
+	  		ST.issue_id IS NOT NULL AND 
+	  		I.id = ST.issue_id AND
+	  		Indi.id = I.indicia_publisher_id
+	  GROUP BY STHS.story_id) S1
+GROUP BY S1.indicia_publisher_id
+ORDER BY MAX(S1.count) DESC
+LIMIT 10;
+
+
+-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+EXPLAIN EXTENDED (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10);
+
+
+
 -- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
 SELECT * 
 FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
@@ -176,8 +208,6 @@ ORDER BY COUNT(*) DESC
 LIMIT 1;
 
 </string>
-			<key>table</key>
-			<string>Story_Type</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
@@ -192,138 +222,316 @@ LIMIT 1;
 	<array/>
 	<key>queryHistory</key>
 	<array>
-		<string>-- h) Print the writers of cartoon stories who have worked as writers for more than one indicia publisher.
-SELECT S2.name
-FROM (SELECT I.indicia_publisher_id, I.id as issueId FROM Issue I) S1 JOIN
-	 (SELECT ST.id as storyId, ST.issue_id, STA.name
-	  FROM Story ST, Story_Has_Scripts STS, Story_Artists STA, Story_Type STP
-	  WHERE ST.type_id = STP.id AND STP.name = 'cartoon' AND ST.id = STS.story_id AND STS.artist_id = STA.id) S2
-	  ON S1.issueId = S2.storyId
-GROUP BY S2.name
-HAVING COUNT(DISTINCT(S1.indicia_publisher_id)) &gt;= 2</string>
-		<string>-- g) Print all story types that have not been published as a part of Italian magazine series.
-SELECT DISTINCT(STP.id), STP.name
-FROM Story ST, Story_Type STP
-WHERE ST.type_id = STP.id AND 
-ST.issue_id NOT IN (SELECT S1.id
-					FROM (SELECT I.series_id, I.id FROM Issue I) S1 JOIN
-				 		 (SELECT S.id as seriesId
-					      FROM Series S, Series_Publication_Type SPT, Publisher P, Country C
-					 	  WHERE S.publisher_id = P.id AND P.country_id = C.id AND C.name = "Italy" AND
-	  	  			     	    S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-				 		  ON S1.series_id = S2.seriesId)</string>
-		<string>-- f) Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-SELECT L.name, COUNT(*)
-FROM Language L,
-	 (SELECT ST.issue_id FROM Story ST) S1 JOIN
-	 (SELECT S.language_id, I.id as issueId
-	  FROM Issue I, Series S, Series_Publication_Type SPT
-	  WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	  ON S1.issue_id = S2.issueId
-WHERE L.id = S2.language_id
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- l) Print the 10 indicia publishers with the highest number of script writers in a single story.
--- NEEDS TO BE FASTER !
-SELECT S2.indicia_publisher_id, INDI.name
-FROM Indicia_Publisher INDI,
-	 (SELECT ST.issue_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL GROUP BY STHS.story_id) S1 JOIN
-	 (SELECT I.id, I.indicia_publisher_id FROM Issue I WHERE I.indicia_publisher_id IS NOT NULL) S2
-	 ON S1.issue_id = S2.id
-WHERE INDI.id = S2.indicia_publisher_id
-GROUP BY S2.indicia_publisher_id
+		<string>SELECT S1.indicia_publisher_id, S1.name
+FROM
+	 (SELECT I.indicia_publisher_id, Indi.name, COUNT(*) as count 
+	  FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher Indi
+	  WHERE ST.id = STHS.story_id AND 
+	  		ST.issue_id IS NOT NULL AND 
+	  		I.id = ST.issue_id AND
+	  		Indi.id = I.indicia_publisher_id
+	  GROUP BY STHS.story_id) S1
+GROUP BY S1.indicia_publisher_id
 ORDER BY MAX(S1.count) DESC
 LIMIT 10</string>
-		<string>-- o) Given an issue, print its most reprinted story.
-SELECT S.id, S.title
-FROM Issue I, Story S, Story_Reprint STR
-WHERE I.id = 1268358 AND S.issue_id IS NOT NULL AND I.id = S.issue_id AND STR.origin_id = S.id
-GROUP BY STR.origin_id
+		<string>SELECT S1.indicia_publisher_id, S1.name, S1.count
+FROM
+	 (SELECT I.indicia_publisher_id, Indi.name, COUNT(*) as count 
+	  FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher Indi
+	  WHERE ST.id = STHS.story_id AND 
+	  		ST.issue_id IS NOT NULL AND 
+	  		I.id = ST.issue_id AND
+	  		Indi.id = I.indicia_publisher_id
+	  GROUP BY STHS.story_id) S1
+GROUP BY S1.indicia_publisher_id
+ORDER BY MAX(S1.count) DESC
+LIMIT 10</string>
+		<string>SELECT S1.indicia_publisher_id, INDI.name
+FROM
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count 
+	  FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher Indi
+	  WHERE ST.id = STHS.story_id AND 
+	  		ST.issue_id IS NOT NULL AND 
+	  		I.id = ST.issue_id AND
+	  		Indi.id = I.indicia_publisher_id
+	  GROUP BY STHS.story_id) S1
+GROUP BY S1.indicia_publisher_id
+ORDER BY MAX(S1.count) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+EXPLAIN EXTENDED (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
 ORDER BY COUNT(*) DESC
-LIMIT 1</string>
-		<string>-- n) Print the top 5 series with most issues
-SELECT I.series_id, S.name
-FROM Issue I, Series S
-WHERE I.series_id IS NOT NULL AND I.series_id = S.id
-GROUP BY I.series_id
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+PROCEDURE ANALYZE (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
 ORDER BY COUNT(*) DESC
-LIMIT 5</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT * 
-FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%marvel%' AND P.name NOT LIKE '%dc%' AND STHC.story_id = S.id AND STC.id = STHC.character_id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%marvel%' AND P.name LIKE '%dc%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT * 
-FROM (SELECT DISTINCT(STHC.character_id), STC.name, S.title, P.id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%marvel%' AND P.name NOT LIKE '%dc%' AND STHC.story_id = S.id AND STC.id = STHC.character_id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%marvel%' AND P.name LIKE '%dc%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT * 
-FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%Marvel%' AND P.name NOT LIKE '%DC%' AND STHC.story_id = S.id AND STC.id = STHC.character_id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%Marvel%' AND P.name LIKE '%DC%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT * 
-FROM (SELECT STHC.character_id, STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%Marvel%' AND P.name NOT LIKE '%DC%' AND STHC.story_id = S.id AND STC.id = STHC.character_id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%Marvel%' AND P.name LIKE '%DC%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT *
-FROM (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%Marvel%' AND P.name NOT LIKE '%DC%' AND STHC.story_id = S.id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%Marvel%' AND P.name LIKE '%DC%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT *
-FROM (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%$Marvel%' AND P.name LIKE '%$DC%' AND STHC.story_id = S.id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%$Marvel%' AND P.name LIKE '%$DC%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT *
-FROM (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name LIKE '%$Marvel%' AND P.name NOT LIKE '%$DC%' AND STHC.story_id = S.id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name LIKE '%$Marvel%' AND P.name LIKE '%$DC%' AND STHC.story_id = S.id)</string>
-		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
-SELECT *
-FROM (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-	 P.name CONTAINS 'Marvel' AND P.name NOT CONTAINS 'DC' AND STHC.story_id = S.id) S1
-WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
-	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
-						 P.name CONTAINS 'Marvel' AND P.name CONTAINS 'DC' AND STHC.story_id = S.id)</string>
-		<string>UPDATE Publisher set url = NULL WHERE url LIKE 'NULL'</string>
-		<string>UPDATE Publisher set url = NULL WHERE url = 'NULL'</string>
-		<string>UPDATE Publisher set url = NULL WHERE url = 'NULL
-'</string>
-		<string>UPDATE Publisher set url = NULL WHERE url = 'NULL'</string>
-		<string>UPDATE Publisher set url = NULL WHERE url = "NULL\n"</string>
-		<string>-- o) Given an issue, print its most reprinted story.
-SELECT TOP 1
-FROM Issue I, Story S, Story_Reprint STR
-WHERE I.id = 1268358 AND S.issue_id IS NOT NULL AND I.id = S.issue_id AND STR.origin_id = S.id
-GROUP BY STR.origin_id
+LIMIT 10)</string>
+		<string>DESCRIBE</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+ANALYSE (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+DESCRIBE (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+ANALYZE (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+EXPLAIN ANALYZE (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+EXPLAIN (SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10)</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+EXPLAIN SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = I.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT I.indicia_publisher_id, INDI.name, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I, Indicia_Publisher INDI
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id AND
+	  INDI.id = S1.indicia_publisher_id
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT I.indicia_publisher_id, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I 
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id 
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT DISTINCT(I.indicia_publisher_id), COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I 
+WHERE I.indicia_publisher_id IS NOT NULL AND 
+	  ST.issue_id IS NOT NULL AND 
+	  ST.id = STHS.story_id AND
+	  I.id = ST.issue_id 
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT I.indicia_publisher_id, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I 
+WHERE ST.id = STHS.story_id AND 
+	  ST.issue_id IS NOT NULL AND 
+	  I.id = ST.issue_id 
+GROUP BY STHS.story_id 
+ORDER BY COUNT(*) DESC
+LIMIT 10</string>
+		<string>-- l) 
+/* SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10; */
+
+
+SELECT I.indicia_publisher_id, COUNT(*) as count 
+FROM Story ST, Story_Has_Scripts STHS, Issue I 
+WHERE ST.id = STHS.story_id AND 
+	  ST.issue_id IS NOT NULL AND 
+	  I.id = ST.issue_id 
+GROUP BY STHS.story_id 
 ORDER BY COUNT(*) DESC</string>
+		<string>-- l) 
+SELECT S1.indicia_publisher_id, INDI.name, S1.count
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10</string>
+		<string>-- l) 
+SELECT S1.indicia_publisher_id, INDI.name
+FROM Indicia_Publisher INDI,
+	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
+WHERE INDI.id = S1.indicia_publisher_id
+GROUP BY S1.indicia_publisher_id 
+LIMIT 10</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
