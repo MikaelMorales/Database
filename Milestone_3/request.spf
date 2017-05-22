@@ -62,11 +62,7 @@
 			<key>contentSortColIsAsc</key>
 			<true/>
 			<key>contentViewport</key>
-<<<<<<< HEAD
-			<string>{{0, 0}, {694, 450}}</string>
-=======
 			<string>{{0, 0}, {694, 456}}</string>
->>>>>>> 20475500d4b5b7f3676652c1614aea3f6af41de6
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
@@ -282,6 +278,28 @@ LIMIT 1;
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>-- b) Print the names of publishers who have series with all series types.
+
+-- to undertand this query refer to the following website which explains how to do a divide operation in mysql : https://www.simple-talk.com/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/
+
+SELECT DISTINCT Y.name FROM
+(
+	SELECT X.name, SP.id FROM(
+		SELECT DISTINCT  P.name, S.publication_type_id FROM Publisher P
+		INNER JOIN Series S ON P.id = S.publisher_id WHERE S.publication_type_id IS NOT NULL) X
+INNER JOIN `Series_Publication_Type` SP ON SP.id = X.publication_type_id ) AS Y
+WHERE NOT EXISTS
+		(
+			SELECT * FROM Series_Publication_Type
+			WHERE NOT EXISTS
+			(
+				SELECT *
+				FROM  (
+					SELECT X.name, SP.id FROM (
+						SELECT DISTINCT  P.name, S.publication_type_id FROM Publisher P
+						INNER JOIN Series S ON P.id = S.publisher_id WHERE S.publication_type_id IS NOT NULL) X
+					INNER JOIN `Series_Publication_Type` SP ON SP.id = X.publication_type_id ) AS Z
+				WHERE (Y.name = Z.`name` ) AND Z.id = Series_Publication_type.id))</string>
 		<string>SELECT S1.indicia_publisher_id, S1.name
 FROM
 	 (SELECT I.indicia_publisher_id, Indi.name, COUNT(*) as count
@@ -580,13 +598,6 @@ GROUP BY STHS.story_id
 ORDER BY COUNT(*) DESC</string>
 		<string>-- l)
 SELECT S1.indicia_publisher_id, INDI.name, S1.count
-FROM Indicia_Publisher INDI,
-	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
-WHERE INDI.id = S1.indicia_publisher_id
-GROUP BY S1.indicia_publisher_id
-LIMIT 10</string>
-		<string>-- l)
-SELECT S1.indicia_publisher_id, INDI.name
 FROM Indicia_Publisher INDI,
 	 (SELECT I.indicia_publisher_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS, Issue I WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL AND I.id = 		 ST.issue_id GROUP BY STHS.story_id ORDER BY COUNT(*) DESC) S1
 WHERE INDI.id = S1.indicia_publisher_id
