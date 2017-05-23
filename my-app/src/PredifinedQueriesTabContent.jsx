@@ -10,7 +10,7 @@ class PredifinedQueriesTabContent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {waiting: false, toast: ""};
+    this.state = {toast: ""};
   }
 
   idToTitle = [
@@ -25,20 +25,28 @@ class PredifinedQueriesTabContent extends React.Component {
   ];
 
   executePredifinedQuery = (id) => {
-    this.setState({waiting: true});
-    event.preventDefault();
-		axios.post('http://localhost/fetch_predifined_queries.php', {
-		    QueryId: id
-	    })
-	    .then((res) => {
-			console.log(res.data);
-      this.props.pushResults(res.data);
-      this.setState({waiting: false});
-		})
-		.catch((res) => {
-			console.log(res);
-            this.setState({waiting: false, toast: res["data"]});
-		});
+      let url = "http://localhost/fetch_predifined_queries.php";
+      let body = {
+          QueryId: id
+      };
+      this.props.request(url, body, 0, false);
+
+
+
+    // this.setState({waiting: true});
+    // event.preventDefault();
+	// 	axios.post('http://localhost/fetch_predifined_queries.php', {
+	// 	    QueryId: id
+	//     })
+	//     .then((res) => {
+	// 		console.log(res.data);
+    //   this.props.pushResults(res.data);
+    //   this.setState({waiting: false});
+	// 	})
+	// 	.catch((res) => {
+	// 		console.log(res);
+    //         this.setState({waiting: false, toast: res["data"]});
+	// 	});
 	}
 
   render() {
@@ -68,7 +76,7 @@ class PredifinedQueriesTabContent extends React.Component {
     }
 
     let circular;
-    if (this.state.waiting) {
+    if (this.props.waiting) {
       circular = <CircularProgress size={100} thickness={10} color="#E24E42" />;
     }
     return (
@@ -83,7 +91,7 @@ class PredifinedQueriesTabContent extends React.Component {
                 <ListItem
                     primaryText={item.title}
                     onClick={(e) => this.executePredifinedQuery(item.id)}
-                    disabled={this.state.waiting}
+                    disabled={this.props.waiting}
                 />
               </div>
             )}

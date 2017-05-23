@@ -18,11 +18,9 @@ class InsertDeleteTabContent extends React.Component {
             tableId: this.state.table
         })
 	    .then((res) => {
-            console.log(res['data'])
-			this.setState({waiting: false, tableInfo: res.data});
+			this.setState({waiting: false, tableInfo: res['data']});
 		})
 		.catch((res) => {
-			console.log(res);
 			this.setState({waiting: false});
 		});
     }
@@ -94,9 +92,10 @@ class InsertDeleteTabContent extends React.Component {
 
                      <DropDownMenu value={this.state.table} onChange={this.onSelectTable} style={style.dropDownStyle}>
                          <MenuItem value={0} primaryText="Choose a table" />
-                         <MenuItem value={1} primaryText="Story"/>
-                         <MenuItem value={2} primaryText="Artists"/>
-                         <MenuItem value={3} primaryText="Characters"/>
+                         {this.props.tables.map((table) =>
+                             <MenuItem key={table["id"]} value={table["id"]} primaryText={table["name"]}/>
+                         )}
+
                      </DropDownMenu>
                  </Paper>
             </div>;

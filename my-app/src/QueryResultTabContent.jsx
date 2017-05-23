@@ -1,46 +1,78 @@
 import * as React from "react";
 import DisplayTable from "./DisplayTable";
+import RightArrow from "material-ui/svg-icons/hardware/keyboard-arrow-right";
+import LeftArrow from "material-ui/svg-icons/hardware/keyboard-arrow-left";
+import IconButton from 'material-ui/IconButton';
 
 class QueryResultTabContent extends React.Component {
+	constructor(props) {
+		super(props);
+	}
 
-	tableToName = {"Story_Artists": "Artists", "Story_Characters": "Characters", "Brand_Group": "Brand Group"};
-
-	getTableName(key) {
-		if (key in this.tableToName) {
-			return this.tableToName[key];
-		} else {
-			return key;
-		}
+	toNextPage = (nextPage) => {
+		this.props.request(this.props.url, this.props.body, nextPage, true);
 	}
 
 	render() {
-		console.log("call to render method of query result tab content");
-		if (!Object.keys(this.props.resultToDisplay).length) {
-			console.log("result to display null or empty : ");
-			console.log(JSON.stringify(this.props.resultToDisplay));
-			return (<h1>You have no query results</h1>);
+		if (!Object.keys(this.props.resultToDisplay).length && !this.props.restOfRequest) {
+			return (<h1 style={{maxWidth: 400, margin: "auto"}}>You have no query results</h1>);
 		} else {
-			console.log("result to display ok : " + this.props.resultToDisplay);
 			const style = {
 				containerStyle: {
 				 	display: "flex",
 				 	flexDirection: "column",
 				 	justifyContent: "spaceBetween"
+				},
+				arrowContainer: {
+					display: "flex",
+					justifyContent: "center"
+				},
+				noPageStyle: {
+					maxWidth: 400,
+					margin: "auto"
 				}
 			}
-			console.log(this.props.resultToDisplay);
+
+			let noPage;
+			if (this.props.resultToDisplay.length === 0) {
+				noPage = <h1 style={style.noPageStyle}>No page anymore</h1>;
+			}
 			return(
 				<div style={style.containerStyle}>
 					<div/>
 
+				{noPage}
+
 					{Object.keys(this.props.resultToDisplay).map((key) =>
 						<DisplayTable
 							key={key}
-							tableName={this.getTableName(key)}
+							tableName={key}
 							columnNames={Object.keys(this.props.resultToDisplay[key][0])}
 							items={this.props.resultToDisplay[key]}
 						/>
 					)}
+
+					<div style={style.arrowContainer}>
+						<IconButton
+							tooltip="previous page"
+							touch={true}
+							tooltipPosition="top-left"
+							onTouchTap={(e) => this.toNextPage(-1)}
+							disabled={this.props.prevDisabled || this.props.waiting}
+						>
+							<LeftArrow />
+						</IconButton>
+
+						<IconButton
+							tooltip="next page"
+							touch={true}
+							tooltipPosition="top-right"
+							onTouchTap={(e) => this.toNextPage(1)}
+							disabled={this.props.waiting || this.props.resultToDisplay.length === 0}
+						>
+							<RightArrow />
+						</IconButton>
+					</div>
 				</div>
 
 			);

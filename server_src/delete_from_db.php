@@ -1,9 +1,9 @@
 <?php
-	include("Utils.php");
-    include("TablesInformations.php");
+	include_once("Utils.php");
+    include_once("TablesInformations.php");
 	$request_body = file_get_contents('php://input');
     $data = json_decode($request_body, true);
-    $table = TablesInformations::getName($data['Table']);
+	$table = $data['Table'];
     $attributes = $data['Attributes'];
 
 	$connection_mysql = Utils::connect_to_db();
@@ -39,8 +39,10 @@
         error_log($request . "\n", 3, "test.txt");
 
         if ($connection_mysql->query($request) === TRUE) {
+			http_response_code(200);
             echo "Deletion finished successfully";
         } else {
+			http_response_code(500);
             echo "Error: " . $request . "<br>" . $connection_mysql->error;
         }
     }

@@ -11,10 +11,13 @@ import {Card, CardHeader} from 'material-ui/Card';
 
 class DisplayTable extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {currentPageNb: 0};
+    }
+
 	render() {
     let rowId = 0;
-		console.log("items");
-		console.log(this.props.items);
 		if (!Object.keys(this.props.items).length) {
 			return (<div/>);
 		} else {
@@ -28,6 +31,8 @@ class DisplayTable extends React.Component {
 				tableStyle: {
 					maxWidth: "1000px",
 					margin: 30,
+                    tableLayout: 'auto',
+                     overflowX: "auto",
 				},
 				superHeaderStyle: {
 					fontWeight: "bold",
@@ -38,11 +43,14 @@ class DisplayTable extends React.Component {
 				},
 				cardHeaderStyle: {
 					backgroundColor: "#EFEFEF"
-				}
+				},
+                cardStyle: {
+                    minWidth: "60%"
+                }
 			}
 			return (
 				<div style={style.tableContainer}>
-					<Card>
+					<Card style={style.cardStyle}>
 						<CardHeader
 					      title={this.props.tableName}
 					      style={style.cardHeaderStyle}
@@ -50,15 +58,15 @@ class DisplayTable extends React.Component {
 						<Table
 							style={style.tableStyle}
 							fixedHeader={true}
+                            bodyStyle={{height: 'inherit', overflow: 'auto'}}
 						>
-						    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-						      	<TableRow>
+
+						    <TableBody displayRowCheckbox={false} showRowHover={true} style={{marginTop: 0}}>
+                                <TableRow>
 						      		{this.props.columnNames.map((name) =>
-						      			<TableHeaderColumn key={name} style={style.headerStyle}>{name}</TableHeaderColumn>
+						      			<TableRowColumn key={name} style={style.headerStyle}>{name}</TableRowColumn>
 						      		)}
 						     	 </TableRow>
-						    </TableHeader>
-						    <TableBody displayRowCheckbox={false} showRowHover={true}>
 						    	{this.props.items.map((item) =>
 						    		<TableRow key={++rowId} >
 						    			{this.props.columnNames.map((name) =>

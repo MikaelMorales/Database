@@ -12,7 +12,7 @@ class SearchTabContent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {value: "", advancedOpt: false, selectedTables: new Set(), waiting: false, requestType: 1, toast: ""}
+		this.state = {value: "", advancedOpt: false, selectedTables: new Set(), requestType: 1, toast: ""}
 	}
 
 	handleChange = (event) => {
@@ -25,29 +25,22 @@ class SearchTabContent extends React.Component {
 
     handleSubmit = (event) => {
 		event.preventDefault();
-		this.setState({waiting: true});
+
 		let body;
 		let url;
 		if (this.state.requestType === 1) {
 			body = {Request: this.state.value,
-					Tables: Array.from(this.state.selectedTables).toString()
+					Tables: Array.from(this.state.selectedTables).toString(),
 					};
 			url = 'http://localhost/search_request.php';
 		} else {
-			body = {Statement: this.state.value};
+			body = {
+				Statement: this.state.value,
+			};
 			url = 'http://localhost/execute_sql_statement.php';
 		}
-		axios.post(url, body)
-	    .then((res) => {
-			this.props.pushResults(res.data);
-			console.log(JSON.stringify(res.data));
-			console.log(res.data["Story"]);
-			this.setState({waiting: false, toast: "Search finished"});
-		})
-		.catch((res) => {
-			console.log(res);
-			this.setState({waiting: false, toast: res["data"]});
-		});
+
+		this.props.request(url, body, 0, false);
 	}
 
 	handleCheckboxCheck = (value, checked) => {
@@ -56,7 +49,6 @@ class SearchTabContent extends React.Component {
 		} else {
 			this.state.selectedTables.delete(value)
 		}
-		// this.setState({selectedTables: this.state.selectedTables})
 	}
 
 	render() {
@@ -83,29 +75,24 @@ class SearchTabContent extends React.Component {
 		}
 
 		let circular;
-		if (this.state.waiting) {
+		if (this.props.waiting) {
 			circular = <CircularProgress size={60} thickness={10} color="#E24E42" style={style.wait} />;
 		}
 
 		let advOpt = null;
-		if (this.state.advancedOpt) {
+		if (this.state.advancedOpt && this.props.tables.length > 0) {
 			advOpt = (
 				<div>
 					<h3 style={{fontWeight: "normal"}}>Tables to search:</h3>
-					<Checkbox
-						label="Story"
-						onCheck={(e, checked) => this.handleCheckboxCheck("Story", checked)}
-					/>
-					<Checkbox
-						label="Artists"
-						onCheck={(e, checked) => this.handleCheckboxCheck("Story_Artists", checked)}
-					/>
-					<Checkbox
-						label="Characters"
-						onCheck={(e, checked) => this.handleCheckboxCheck("Story_Characters", checked)}
-					/>
+					{this.props.tables.map((table) =>
+						<Checkbox
+							key={table["id"]}
+							label={table["name"]}
+							onCheck={(e, checked) => this.handleCheckboxCheck(table["id"], checked)}
+						/>
+					)}
 				</div>
-			)
+			);
 		}
 
 		return (
@@ -120,7 +107,7 @@ class SearchTabContent extends React.Component {
 		                handleChange={this.handleChange}
 		                handleSubmit={(e) => this.handleSubmit(e)}
 		                buttonLabel={"Search"}
-		                buttonDisabled={this.state.waiting}/>
+		                buttonDisabled={this.props.waiting}/>
 
 					<DropDownMenu value={this.state.requestType} onChange={(e, index, value) => this.setState({requestType: value})} style={style.dropDownStyle}>
 					 <MenuItem value={1} primaryText="Keyword" />
