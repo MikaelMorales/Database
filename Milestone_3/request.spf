@@ -238,6 +238,17 @@ LIMIT 1;
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>-- f) Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
+SELECT L.name, COUNT(*)
+FROM Language L,
+	 (SELECT ST.issue_id FROM Story ST) S1 JOIN
+	 (SELECT S.language_id, I.id as issueId
+	  FROM Issue I, Series S, Series_Publication_Type SPT
+	  WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
+	  ON S1.issue_id = S2.issueId
+WHERE L.id = S2.language_id
+GROUP BY S2.language_id
+HAVING COUNT(*) &gt; 10000</string>
 		<string>-- h) Print the writers of cartoon stories who have worked as writers for more than one indicia publisher.
 SELECT S2.name
 FROM (SELECT I.indicia_publisher_id, I.id as issueId FROM Issue I) S1 JOIN
@@ -258,17 +269,6 @@ ST.issue_id NOT IN (SELECT S1.id
 					 	  WHERE S.publisher_id = P.id AND P.country_id = C.id AND C.name = "Italy" AND
 	  	  			     	    S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
 				 		  ON S1.series_id = S2.seriesId)</string>
-		<string>-- f) Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-SELECT L.name, COUNT(*)
-FROM Language L,
-	 (SELECT ST.issue_id FROM Story ST) S1 JOIN
-	 (SELECT S.language_id, I.id as issueId
-	  FROM Issue I, Series S, Series_Publication_Type SPT
-	  WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	  ON S1.issue_id = S2.issueId
-WHERE L.id = S2.language_id
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
 		<string>-- l) Print the 10 indicia publishers with the highest number of script writers in a single story.
 -- NEEDS TO BE FASTER !
 SELECT S2.indicia_publisher_id, INDI.name
