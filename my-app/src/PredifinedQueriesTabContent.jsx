@@ -4,12 +4,13 @@ import RaisedButton from "material-ui/RaisedButton";
 import {Card} from 'material-ui/Card';
 import axios from "axios";
 import CircularProgress from 'material-ui/CircularProgress';
+import Snackbar from 'material-ui/Snackbar';
 
 class PredifinedQueriesTabContent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {waiting: false};
+    this.state = {toast: ""};
   }
 
   idToTitle = [
@@ -24,19 +25,28 @@ class PredifinedQueriesTabContent extends React.Component {
   ];
 
   executePredifinedQuery = (id) => {
-    this.setState({waiting: true});
-    event.preventDefault();
-		axios.post('http://localhost/fetch_predifined_queries.php', {
-		    QueryId: id
-	    })
-	    .then((res) => {
-			console.log(res.data);
-      this.props.pushResults(res.data);
-      this.setState({waiting: false});
-		})
-		.catch((res) => {
-			console.log(res);
-		});
+      let url = "http://localhost/fetch_predifined_queries.php";
+      let body = {
+          QueryId: id
+      };
+      this.props.request(url, body, 0, false);
+
+
+
+    // this.setState({waiting: true});
+    // event.preventDefault();
+	// 	axios.post('http://localhost/fetch_predifined_queries.php', {
+	// 	    QueryId: id
+	//     })
+	//     .then((res) => {
+	// 		console.log(res.data);
+    //   this.props.pushResults(res.data);
+    //   this.setState({waiting: false});
+	// 	})
+	// 	.catch((res) => {
+	// 		console.log(res);
+    //         this.setState({waiting: false, toast: res["data"]});
+	// 	});
 	}
 
   render() {
@@ -66,7 +76,7 @@ class PredifinedQueriesTabContent extends React.Component {
     }
 
     let circular;
-    if (this.state.waiting) {
+    if (this.props.waiting) {
       circular = <CircularProgress size={100} thickness={10} color="#E24E42" />;
     }
     return (
@@ -78,17 +88,22 @@ class PredifinedQueriesTabContent extends React.Component {
           <List>
             {this.idToTitle.map((item) =>
               <div key={item.id} style={style.item}>
-                <ListItem primaryText={item.title} />
-                <RaisedButton
-                  label="execute request"
-                  style={style.executeButton}
-                  onClick={(e) => this.executePredifinedQuery(item.id)}
-                  disabled={this.state.waiting}
+                <ListItem
+                    primaryText={item.title}
+                    onClick={(e) => this.executePredifinedQuery(item.id)}
+                    disabled={this.props.waiting}
                 />
               </div>
             )}
           </List>
       </Card>
+
+      <Snackbar
+       open={this.state.toast !== null && this.state.toast !== ""}
+       message={this.state.toast}
+       autoHideDuration={4000}
+       onRequestClose={(e) => this.setState({toast: ""})}
+     />
     </div>
     );
   }
