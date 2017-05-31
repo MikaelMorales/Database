@@ -43,15 +43,14 @@ WHERE I.indicia_publisher_id = IndiPubli.id AND IndiPubli.name LIKE "%DC comics%
 GROUP BY I.indicia_publisher_id;
 
 -- Print the titles of the 10 most reprinted stories
-SELECT S.title, count FROM
-(SELECT SR.origin_id, COUNT(*) AS count
- FROM Story_Reprint SR
- GROUP BY SR.origin_id
- ORDER BY COUNT(*) DESC) S1
-JOIN Story S
-ON S.id = S1.origin_id
-WHERE S.title IS NOT NULL
-LIMIT 10;
+SELECT S.id, S.title, count  
+FROM (SELECT SR.origin_id, COUNT(*) AS count 
+	  FROM Story_Reprint SR 
+	  GROUP BY SR.origin_id 
+	  ORDER BY COUNT(*) DESC 
+	  LIMIT 10) S1 
+JOIN Story S 
+ON S.id = S1.origin_id;
 
 -- Print the titles of the 10 most reprinted stories
 -- But slower.

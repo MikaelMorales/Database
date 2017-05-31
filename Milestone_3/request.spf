@@ -45,8 +45,6 @@
 		<dict>
 			<key>connectionEncoding</key>
 			<string>utf8</string>
-			<key>contentFilter</key>
-			<dict/>
 			<key>contentPageNumber</key>
 			<integer>1</integer>
 			<key>contentSelection</key>
@@ -70,7 +68,7 @@
 			<key>contentSortColIsAsc</key>
 			<true/>
 			<key>contentViewport</key>
-			<string>{{0, 0}, {748, 475}}</string>
+			<string>{{0, 0}, {694, 450}}</string>
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
@@ -228,7 +226,7 @@ FROM (SELECT I.indicia_publisher_id, I.id as issueId FROM Issue I) S1 JOIN
 	 (SELECT ST.id as storyId, ST.issue_id, STA.name
 	  FROM Story ST, Story_Has_Scripts STS, Story_Artists STA, Story_Type STP
 	  WHERE ST.type_id = STP.id AND STP.name = 'cartoon' AND ST.id = STS.story_id AND STS.artist_id = STA.id) S2
-	  ON S1.issueId = S2.storyId
+	  ON S1.issueId = S2.issue_id
 GROUP BY S2.name
 HAVING COUNT(DISTINCT(S1.indicia_publisher_id)) &gt;= 2;
 

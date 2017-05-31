@@ -13,15 +13,15 @@
 			<key>database</key>
 			<string>comics</string>
 			<key>host</key>
-			<string>127.0.0.1</string>
+			<string>localhost</string>
 			<key>kcid</key>
-			<string>9181927296464025220</string>
+			<string>-1635523965695179128</string>
 			<key>name</key>
-			<string>Comics</string>
-			<key>port</key>
-			<integer>3306</integer>
+			<string>comics</string>
 			<key>rdbms_type</key>
 			<string>mysql</string>
+			<key>socket</key>
+			<string>/tmp/mysql.sock</string>
 			<key>sslCACertFileLocation</key>
 			<string></string>
 			<key>sslCACertFileLocationEnabled</key>
@@ -35,11 +35,11 @@
 			<key>sslKeyFileLocationEnabled</key>
 			<integer>0</integer>
 			<key>type</key>
-			<string>SPTCPIPConnection</string>
+			<string>SPSocketConnection</string>
 			<key>useSSL</key>
 			<integer>0</integer>
 			<key>user</key>
-			<string>Mikael</string>
+			<string>root</string>
 		</dict>
 		<key>session</key>
 		<dict>
@@ -68,7 +68,47 @@
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
-			<string>
+			<string>-- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name 
+FROM (SELECT  I.series_id 
+	  FROM (SELECT DISTINCT S1.issue_id, S1.type_id FROM Story S1
+	  		LEFT JOIN 
+	  	   (SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+			ON S1.type_id = A.id WHERE A.id IS NULL) X 
+		   INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id ;
+
+-- version 2 execution time: 11.3s 
+
+SELECT SER.name FROM 
+(
+	SELECT  I.series_id FROM 
+	(
+		SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN
+		(
+			SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id HAVING COUNT(*) &gt;= 
+	(
+		SELECT MAX(counted) FROM 
+		(
+			SELECT  COUNT(*) AS counted FROM 
+			(
+				SELECT DISTINCT S2.issue_id, S2.type_id FROM  Story S2 LEFT JOIN
+				(
+					SELECT T1.id FROM Story_Type T1, Story S3 WHERE S3.`type_id` = T1.id GROUP BY T1.id ORDER BY COUNT(*) DESC LIMIT 1) A1 
+				ON S2.type_id = A1.id WHERE A1.id IS NULL   ) X1 
+			INNER JOIN Issue I1 ON X1.issue_id = I1.id GROUP BY I1.series_id) AS counts
+		)
+	) Z
+INNER JOIN Series SER ON Z.series_id = SER.id ;
+
+
+
 -- b) Print the names of publishers who have series with all series types.
 
 -- to undertand this query refer to the following website which explains how to do a divide operation in mysql : https://www.simple-talk.com/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/
@@ -82,7 +122,7 @@ INNER JOIN Series_Publication_Type SP ON SP.id = X.publication_type_id ) AS Y
 WHERE NOT EXISTS
 		(
 			SELECT * FROM Series_Publication_Type
-			WHERE NOT EXISTS
+			WHERE NOT EXISTS	
 			(
 				SELECT * 
 				FROM  (
@@ -95,7 +135,7 @@ WHERE NOT EXISTS
 -- 0.175 sec --&gt; 0.173 sec
 CREATE INDEX publisher_name ON Publisher(name) USING HASH;
 
- -- c) Print the 10 most-reprinted characters from Alan Moore's stories.
+ -- c) Print the 10 most-reprinted characters from Alan Moore's stories. execution time : 0.019 s
 SELECT C1.name FROM 
 (
 	SELECT C.character_id,COUNT(*) FROM (
@@ -124,16 +164,27 @@ ON Y.id = HP.artist_id;
 CREATE INDEX story_genre_name ON Story_Genres(name) USING HASH;
 
 -- e) For each of the top-10 publishers in terms of published series, print the 3 most popular languages of their series.
-SELECT Y.name, L.name 
-FROM (SELECT DISTINCT X.name,S2.language_id 
-	  FROM (SELECT P.id,P.name 
-	  	    FROM Publisher P 
-	  	    INNER JOIN Series S1 ON P.id = S1.publisher_id 
-	  	    GROUP BY S1.publisher_id 
-	  	    ORDER BY COUNT(*) DESC 
-	  	    LIMIT 10) X
- INNER JOIN Series S2 ON X.id = S2.publisher_id) Y 
- INNER JOIN Language L ON Y.language_id = L.id;
+
+SELECT P.name, L.name FROM 
+(
+	SELECT * FROM (SELECT Y.id, Y.language_id , COUNT(*) as count FROM 
+	(
+		SELECT  X.id,S1.language_id FROM 
+		(
+			SELECT P.id FROM Publisher P INNER JOIN Series S ON P.id = S.publisher_id 
+			GROUP BY S.publisher_id ORDER BY COUNT(*) DESC LIMIT 10) X
+		JOIN Series S1 ON X.id = S1.publisher_id) Y  
+	GROUP BY Y.id, Y.language_id) Z WHERE
+	(
+		SELECT COUNT(*) as counted FROM 
+		(
+			SELECT S3.publisher_id, S3.language_id, COUNT(*) as count1 FROM Series S3 GROUP BY S3.publisher_id, S3.language_id) W 
+		WHERE W.publisher_id = Z.id  AND count1 &gt;= count  
+
+	) &lt;= 3 ) R,
+Publisher P, Language L WHERE R.id = P.id AND R.language_id = L.id ;	  
+
+
 
 -- f) Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
 SELECT L.name, COUNT(*)
@@ -170,7 +221,7 @@ FROM (SELECT I.indicia_publisher_id, I.id as issueId FROM Issue I) S1 JOIN
 	 (SELECT ST.id as storyId, ST.issue_id, STA.name
 	  FROM Story ST, Story_Has_Scripts STS, Story_Artists STA, Story_Type STP
 	  WHERE ST.type_id = STP.id AND STP.name = 'cartoon' AND ST.id = STS.story_id AND STS.artist_id = STA.id) S2
-	  ON S1.issueId = S2.storyId
+	  ON S1.issueId = S2.issue_id
 GROUP BY S2.name
 HAVING COUNT(DISTINCT(S1.indicia_publisher_id)) &gt;= 2;
 
@@ -220,7 +271,7 @@ GROUP BY S2.indicia_publisher_id
 ORDER BY MAX(S1.count) DESC
 LIMIT 10;
 
--- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
+-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers. 3.24s
 SELECT * 
 FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
 	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
@@ -228,6 +279,25 @@ FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publish
 WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
 	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
 						 P.name LIKE '%marvel%' AND P.name LIKE '%dc%' AND STHC.story_id = S.id);
+						 
+						 
+-- m) optimized 919ms
+
+SELECT * 
+FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
+	 WHERE I.id = S.issue_id AND 
+	 	   I.indicia_publisher_id = P.id AND
+	 	   P.name LIKE '%marvel%' AND 
+	 	   P.name NOT LIKE '%dc%' AND 
+	 	   STHC.story_id = S.id AND 
+	 	   STC.id = STHC.character_id) S1 JOIN
+			(SELECT DISTINCT(STHC.character_id)
+			 FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
+	 		 WHERE I.id = S.issue_id AND 
+	 		 	   I.indicia_publisher_id = P.id AND
+				   P.name LIKE '%marvel%' AND 
+				   P.name LIKE '%dc%' AND STHC.story_id = S.id) S2
+			ON S1.character_id = S2.character_id;
 	
 
 -- n) Print the top 5 series with most issues
@@ -248,6 +318,24 @@ ORDER BY COUNT(*) DESC
 LIMIT 1;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
@@ -263,6 +351,110 @@ LIMIT 1;
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>-- m) optimized
+
+SELECT * 
+FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
+	 WHERE I.id = S.issue_id AND 
+	 	   I.indicia_publisher_id = P.id AND
+	 	   P.name LIKE '%marvel%' AND 
+	 	   P.name NOT LIKE '%dc%' AND 
+	 	   STHC.story_id = S.id AND 
+	 	   STC.id = STHC.character_id) S1 JOIN
+			(SELECT DISTINCT(STHC.character_id)
+			 FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
+	 		 WHERE I.id = S.issue_id AND 
+	 		 	   I.indicia_publisher_id = P.id AND
+				   P.name LIKE '%marvel%' AND 
+				   P.name LIKE '%dc%' AND STHC.story_id = S.id) S2
+			ON S1.character_id = S2.character_id</string>
+		<string>-- m) Print all Marvel heroes that appear in Marvel-DC story crossovers.
+SELECT * 
+FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
+	 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
+	 P.name LIKE '%marvel%' AND P.name NOT LIKE '%dc%' AND STHC.story_id = S.id AND STC.id = STHC.character_id) S1
+WHERE S1.character_id IN (SELECT STHC.character_id FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
+	 					 WHERE I.id = S.issue_id AND I.indicia_publisher_id = P.id AND
+						 P.name LIKE '%marvel%' AND P.name LIKE '%dc%' AND STHC.story_id = S.id)</string>
+		<string>-- m) optimized
+
+SELECT * 
+FROM (SELECT DISTINCT(STHC.character_id), STC.name FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC, Story_Characters STC
+	 WHERE I.id = S.issue_id AND 
+	 	   I.indicia_publisher_id = P.id AND
+	 	   P.name LIKE '%marvel%' AND 
+	 	   P.name NOT LIKE '%dc%' AND 
+	 	   STHC.story_id = S.id AND 
+	 	   STC.id = STHC.character_id) S1 JOIN
+			(SELECT STHC.character_id
+			 FROM Issue I, Indicia_Publisher P, Story S, Story_Has_Characters STHC
+	 		 WHERE I.id = S.issue_id AND 
+	 		 	   I.indicia_publisher_id = P.id AND
+				   P.name LIKE '%marvel%' AND 
+				   P.name LIKE '%dc%' AND STHC.story_id = S.id) S2
+			ON S1.character_id = S2.character_id</string>
+		<string>-- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name 
+FROM (SELECT  I.series_id 
+	  FROM (SELECT DISTINCT S1.issue_id, S1.type_id FROM Story S1
+	  		LEFT JOIN 
+	  	   (SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+			ON S1.type_id = A.id WHERE A.id IS NULL) X 
+		   INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id</string>
+		<string>-- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name 
+FROM (SELECT  I.series_id 
+	  FROM (SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1
+	  		LEFT JOIN 
+	  	   (SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id</string>
+		<string>-- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name 
+FROM (SELECT  I.series_id 
+	  FROM ((SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1)
+	  		LEFT JOIN 
+	  	   (SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id</string>
+		<string>-- a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name 
+FROM (SELECT  I.series_id 
+	  FROM (SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN (
+			SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A 
+		ON S1.type_id = A.id WHERE A.id IS NULL   ) X 
+	INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id</string>
+		<string>-- l) Print the 10 indicia publishers with the highest number of script writers in a single story.
+-- NEEDS TO BE FASTER !
+SELECT S2.indicia_publisher_id, INDI.name
+FROM Indicia_Publisher INDI,
+	 (SELECT ST.issue_id, COUNT(*) as count FROM Story ST, Story_Has_Scripts STHS WHERE ST.id = STHS.story_id AND ST.issue_id IS NOT NULL GROUP BY STHS.story_id) S1 JOIN
+	 (SELECT I.id, I.indicia_publisher_id FROM Issue I WHERE I.indicia_publisher_id IS NOT NULL) S2
+	 ON S1.issue_id = S2.id
+WHERE INDI.id = S2.indicia_publisher_id
+GROUP BY S2.indicia_publisher_id
+ORDER BY MAX(S1.count) DESC
+LIMIT 10</string>
 		<string>-- f) Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
 SELECT L.name, COUNT(*)
 FROM Language L,
@@ -412,86 +604,6 @@ FROM (SELECT S1.publisher_id
 GROUP BY X.publisher_id, Y.name
 ORDER BY COUNT(*) DESC
 LIMIT 3</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S2.language_id, COUNT(*)
-FROM (SELECT ST.issue_id FROM Story ST) S1 JOIN
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	ON S1.issue_id = S2.issue
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM (SELECT ST.issue_id FROM Story ST) S1 JOIN
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	ON S1.issue_id = S2.issue
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM (SELECT ST.issue_id FROM Story ST) S1 ON
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	ON S1.issue_id = S2.issue
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM SELECT(ST.issue_id FROM Story ST) S1 ON
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S2
-	ON S1.issue_id = S2.issue
-GROUP BY S2.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM SELECT(ST.issue_id FROM Story ST) ON
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S1
-	ON ST.issue_id = S1.issue
-GROUP BY S1.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM SELECT(ST.id FROM Story ST) ON
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S1
-	ON ST.issue_id = S1.issue
-GROUP BY S1.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT S1.language_id, COUNT(*)
-FROM Story ST JOIN
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S1
-ON ST.issue_id = S1.issue
-GROUP BY S1.language_id
-HAVING COUNT(*) &gt; 10000</string>
-		<string>-- Print the languages that have more than 10000 original stories published in magazines, along with the number of those stories.
-
-SELECT St.language_id, COUNT(*)
-FROM Story ST JOIN
-	(SELECT S.language_id, I.id as issue 
-	 FROM Issue I, Series S, Series_Publication_Type SPT
-	 WHERE I.series_id = S.id AND S.publication_type_id = SPT.id AND SPT.name = 'magazine') S1
-ON ST.issue_id = S1.issue
-GROUP BY S1.language_id
-HAVING COUNT(*) &gt; 10000</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>
