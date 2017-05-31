@@ -1,0 +1,31 @@
+This document is a commentary on how the query e) was implemented
+
+Recall that 
+
+e) For each of the top-10 publishers in terms of published series, print the 3 most popular languages of their series.
+
+SELECT P.name, L.name FROM
+(
+    SELECT * FROM (SELECT Y.id, Y.language_id , COUNT(*) as count FROM
+    (
+        SELECT  X.id,S1.language_id FROM
+        (
+            SELECT P.id FROM Publisher P INNER JOIN Series S ON P.id = S.publisher_id
+            GROUP BY S.publisher_id ORDER BY COUNT(*) DESC LIMIT 10) X
+        JOIN Series S1 ON X.id = S1.publisher_id) Y
+    GROUP BY Y.id, Y.language_id) Z WHERE
+    (
+        SELECT COUNT(*) as counted FROM
+        (
+            SELECT S3.publisher_id, S3.language_id, COUNT(*) as count1 FROM Series S3 GROUP BY S3.publisher_id, S3.language_id) W
+        WHERE W.publisher_id = Z.id  AND count1 >= count
+
+    ) <= 3 ) R,
+Publisher P, Language L WHERE R.id = P.id AND R.language_id = L.id ;
+
+
+The first step is to get the 10 publisher in terms of published series. This is done by couting the number of occurence of the publisher id in Series, sorting them in descending order and taking the 10 first one. This is stored in X.
+We then count the number of (publisher id, language id) tuples and store them in Z.
+
+In order to have the 3 most popular language for each top 10 publisher, we filter the Z table by the following. Let the i'th publisher be P_i and the jth language be L_j. For each tuple (P_i, L_j) we count the number of (P_i, language_id)  above (P_i, L_j). If it's number is less or egal than 3, we take it, otherwise we leave it. It's easy to see that if we want the k most popular language we just need to change the number of (P_i, language_id) that is above use. This filter is done for each P_i.  
+
