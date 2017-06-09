@@ -3,11 +3,9 @@ import DisplayTable from "./DisplayTable";
 import RightArrow from "material-ui/svg-icons/hardware/keyboard-arrow-right";
 import LeftArrow from "material-ui/svg-icons/hardware/keyboard-arrow-left";
 import IconButton from 'material-ui/IconButton';
+import CircularProgress from 'material-ui/CircularProgress';
 
 class QueryResultTabContent extends React.Component {
-	constructor(props) {
-		super(props);
-	}
 
 	toNextPage = (nextPage) => {
 		this.props.request(this.props.url, this.props.body, nextPage, true);
@@ -36,6 +34,11 @@ class QueryResultTabContent extends React.Component {
 			let noPage;
 			if (this.props.resultToDisplay.length === 0) {
 				noPage = <h1 style={style.noPageStyle}>No page anymore</h1>;
+			}
+
+			let circular;
+			if (this.props.waiting) {
+			  circular = <CircularProgress size={100} thickness={10} color="#E24E42" />;
 			}
 			return(
 				<div style={style.containerStyle}>
@@ -72,6 +75,9 @@ class QueryResultTabContent extends React.Component {
 						>
 							<RightArrow />
 						</IconButton>
+					</div>
+					<div style={{display: "flex", justifyContent: "center"}}>
+						{circular}
 					</div>
 				</div>
 

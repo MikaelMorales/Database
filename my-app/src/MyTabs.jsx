@@ -85,6 +85,7 @@ class MyTabs extends Component {
 						currentPage={this.state.currentPage}
 						prevDisabled={this.state.currentPage === 0}
 						restOfRequest={this.state.restOfRequest}
+						waiting={this.state.waiting}
 			    	/>
 			    </Tab>
 
