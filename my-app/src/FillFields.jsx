@@ -30,7 +30,7 @@ class FillFields extends React.Component {
     handleSubmit = (event) => {
         let valid = true;
         this.props.requiredFields.map((field) => {
-            if (typeof this.state.requiredFieldValues[field] == "undefined" || this.state.requiredFieldValues[field] == "") {
+            if (typeof this.state.requiredFieldValues[field] === "undefined" || this.state.requiredFieldValues[field] === "") {
                 valid = false;
             }
         });

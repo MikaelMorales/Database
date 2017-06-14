@@ -1,8 +1,6 @@
 import * as React from "react";
 import {List, ListItem} from 'material-ui/List';
-import RaisedButton from "material-ui/RaisedButton";
 import {Card} from 'material-ui/Card';
-import axios from "axios";
 import CircularProgress from 'material-ui/CircularProgress';
 import Snackbar from 'material-ui/Snackbar';
 

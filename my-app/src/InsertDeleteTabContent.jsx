@@ -146,22 +146,13 @@ class InsertDeleteTabContent extends React.Component {
         } else {
             if (!this.state.waiting && this.state.table !== 0) {
                 const fields = this.state.tableInfo[this.state.table].map(item => item["Field"]);
-                // return (
-                //     <div>
-                //         <DeleteEntity
-                //             selectOp={selectOp}
-                //             fields={fields}
-                //             table={this.state.table}
-                //         />
-                //     </div>
-                // );
 
                 return (
                     <div>
                         <FillFields
                             selectOp={selectOp}
                             requiredFields={[]}
-                            notRequiredFields={this.state.tableInfo[this.state.table].map(item => item["Field"])}
+                            notRequiredFields={fields}
                             table={this.state.table}
                             submitLabel={"Delete"}
                             url="http://localhost/delete_from_db.php"
