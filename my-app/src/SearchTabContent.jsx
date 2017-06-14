@@ -3,7 +3,6 @@ import SearchBar from "./SearchBar";
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from "material-ui/RaisedButton";
 import CircularProgress from 'material-ui/CircularProgress';
-import axios from "axios";
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Snackbar from 'material-ui/Snackbar';
