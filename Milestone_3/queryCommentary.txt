@@ -1,0 +1,146 @@
+This document is a commentary on how the queries was implemented.
+
+a) Print the series names that have the highest number of issues which contain a story whose type (e.g., cartoon) is not the one occurring most frequently in the database (e.g, illustration).
+
+-- version 1 execution time: 5.59s
+
+
+SELECT SER.name FROM
+(
+    SELECT  I.series_id FROM (
+                SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN
+        (
+            SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A
+        ON S1.type_id = A.id WHERE A.id IS NULL   ) X
+    INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id ORDER BY COUNT(*) DESC LIMIT  1 ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id ;
+
+
+There is 2 version of the query, because in our opignion the description of the query is not really clear. The series names does imply that it can be the k th most highest number of issues. In the first Version it is easy to choose the value k. In the second version We only take the first Hihest.
+
+The first step is to compute the type id T_i that is the most frequently occuring, this is done is A. Then with the LEFT JOIN A.id IS NULL, we remove all the story that have T_i as type story, this is store in X. The last step is to count the number of series that issues the stories and take the highest one.
+
+-- version 2 execution time: 11.3s
+
+SELECT SER.name FROM
+(
+    SELECT  I.series_id FROM
+    (
+        SELECT DISTINCT S1.issue_id, S1.type_id FROM  Story S1 LEFT JOIN
+        (
+            SELECT T.id FROM Story_Type T, Story S WHERE S.`type_id` = T.id GROUP BY T.id ORDER BY COUNT(*) DESC LIMIT 1) A
+        ON S1.type_id = A.id WHERE A.id IS NULL   ) X
+    INNER JOIN Issue I ON X.issue_id = I.id GROUP BY I.series_id HAVING COUNT(*) >=
+    (
+        SELECT MAX(counted) FROM
+        (
+            SELECT  COUNT(*) AS counted FROM
+            (
+                SELECT DISTINCT S2.issue_id, S2.type_id FROM  Story S2 LEFT JOIN
+                (
+                    SELECT T1.id FROM Story_Type T1, Story S3 WHERE S3.`type_id` = T1.id GROUP BY T1.id ORDER BY COUNT(*) DESC LIMIT 1) A1
+                ON S2.type_id = A1.id WHERE A1.id IS NULL   ) X1
+            INNER JOIN Issue I1 ON X1.issue_id = I1.id GROUP BY I1.series_id) AS counts
+        )
+    ) Z
+INNER JOIN Series SER ON Z.series_id = SER.id ;
+
+The second version  is the same as the first one except that in order to have the hihest number of issue, we count the number of them and compare with the hihest. The difference between the first version and second version is the time of excecution. we gain ~ 5 s.
+
+-- b) Print the names of publishers who have series with all series types.
+
+-- to undertand this query refer to the following website which explains how to do a divide operation in mysql : https://www.simple-talk.com/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/
+
+SELECT DISTINCT Y.name FROM
+(
+    SELECT X.name, SP.id FROM(
+        SELECT DISTINCT  P.name, S.publication_type_id FROM Publisher P
+        INNER JOIN Series S ON P.id = S.publisher_id WHERE S.publication_type_id IS NOT NULL) X
+INNER JOIN Series_Publication_Type SP ON SP.id = X.publication_type_id ) AS Y
+WHERE NOT EXISTS
+        (
+            SELECT * FROM Series_Publication_Type
+            WHERE NOT EXISTS
+            (
+                SELECT *
+                FROM  (
+                    SELECT X.name, SP.id FROM (
+                        SELECT DISTINCT  P.name, S.publication_type_id FROM Publisher P
+                        INNER JOIN Series S ON P.id = S.publisher_id WHERE S.publication_type_id IS NOT NULL) X
+                    INNER JOIN Series_Publication_Type SP ON SP.id = X.publication_type_id ) AS Z
+                WHERE (Y.name = Z.name ) AND Z.id = Series_Publication_type.id));
+
+-- 0.175 sec --> 0.173 sec
+CREATE INDEX publisher_name ON Publisher(name) USING HASH;
+
+The idea is to use the Division operation. As seen in course, this operation fits perfectly for this query. The issue was to implement it since mysql do not propose this operation. After internet research, we inspire ourself from the following website : https://www.simple-talk.com/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/ . To accelerate the query we create an hashindex. It is used to map to strings.
+
+ -- c) Print the 10 most-reprinted characters from Alan Moore's stories. execution time : 0.019 s
+SELECT C1.name FROM
+(
+    SELECT C.character_id,COUNT(*) FROM (
+        SELECT DISTINCT S.title, S.id  FROM  Story_Has_Scripts H, Story_Artists A, Story S , Story_Reprint R
+        WHERE A.name = 'Alan Moore' AND H.artist_id = A.id  AND H.story_id = R.target_id AND R.target_id = S.id ) X
+    INNER JOIN Story_Has_Characters C ON X.id = C.story_id GROUP BY C.character_id ORDER BY COUNT(*) DESC LIMIT 10 ) Y
+INNER JOIN Story_Characters C1
+ON Y.character_id = C1.id ;
+
+CREATE INDEX name_index ON Story_Artists (name) USING HASH;
+
+
+We first get all the story where Alan Moore is involved, store them in X. We count the occurences of the Characters in each stories and print out the top 10. We used hashIndex to map Strings.
+
+--  d) Print the writers of nature-related stories that have also done the pencilwork in all their nature-related stories.
+
+SELECT DISTINCT Y.name FROM
+(
+    SELECT DISTINCT A.id, A.name FROM
+    (
+        SELECT DISTINCT S.id  FROM Story S, Story_Genres G, Story_Has_Genres HG
+        WHERE G.name = 'nature' AND HG.genre_id = G.id AND HG.story_id = S.id) X,
+        Story_Has_Scripts HS , Story_Artists A
+    WHERE X.id = HS.story_id AND HS.artist_id = A.id) Y
+INNER JOIN Story_Has_Pencils HP
+ON Y.id = HP.artist_id;
+
+-- 0.012 sec --> 0.011 sec
+CREATE INDEX story_genre_name ON Story_Genres(name) USING HASH;
+
+First retrieve all the stories of nature genres, store it on X. In Y, store the the name and the artist that scripted the stories in X. Finally check if those artists have also pencil the story through Y.id = HP.artist_id . We use the index on Story genre name in order to accelerate the query.
+
+
+
+
+Recall that 
+
+e) For each of the top-10 publishers in terms of published series, print the 3 most popular languages of their series.
+
+SELECT P.name, L.name FROM
+(
+    SELECT * FROM (SELECT Y.id, Y.language_id , COUNT(*) as count FROM
+    (
+        SELECT  X.id,S1.language_id FROM
+        (
+            SELECT P.id FROM Publisher P INNER JOIN Series S ON P.id = S.publisher_id
+            GROUP BY S.publisher_id ORDER BY COUNT(*) DESC LIMIT 10) X
+        JOIN Series S1 ON X.id = S1.publisher_id) Y
+    GROUP BY Y.id, Y.language_id) Z WHERE
+    (
+        SELECT COUNT(*) as counted FROM
+        (
+            SELECT S3.publisher_id, S3.language_id, COUNT(*) as count1 FROM Series S3 GROUP BY S3.publisher_id, S3.language_id) W
+        WHERE W.publisher_id = Z.id  AND count1 >= count
+
+    ) <= 3 ) R,
+Publisher P, Language L WHERE R.id = P.id AND R.language_id = L.id ;
+
+
+The first step is to get the 10 publisher in terms of published series. This is done by couting the number of occurence of the publisher id in Series, sorting them in descending order and taking the 10 first one. This is stored in X.
+We then count the number of (publisher id, language id) tuples and store them in Z.
+
+In order to have the 3 most popular language for each top 10 publisher, we filter the Z table by the following. Let the i'th publisher be P_i and the jth language be L_j. For each tuple (P_i, L_j) we count the number of (P_i, language_id)  above (P_i, L_j). If it's number is less or egal than 3, we take it, otherwise we leave it. It's easy to see that if we want the k most popular language we just need to change the number of (P_i, language_id) that is above use. This filter is done for each P_i.  
+
+
+
+
+
